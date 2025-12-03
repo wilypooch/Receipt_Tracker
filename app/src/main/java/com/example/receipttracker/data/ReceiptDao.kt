@@ -20,7 +20,7 @@ interface ReceiptDao {
     suspend fun delete(receipt: Receipt)
 
     @Query("SELECT * FROM receipt WHERE receipt_id = :id")
-    fun getReceipt(id: Int): Flow<Receipt>
+    fun getReceipt(id: Int): Flow<Receipt?>
 
     @Query("SELECT * FROM receipt WHERE trip_id = :id ORDER BY receipt_id")
     fun getAllReceiptsForTrip(id: Int): Flow<List<Receipt>>
