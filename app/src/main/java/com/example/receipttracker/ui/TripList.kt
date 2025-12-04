@@ -24,14 +24,17 @@ private val tripsForPreview = listOf(
 )
 
 @Composable
-fun TripList(modifier: Modifier = Modifier) {
+fun TripList(
+    items: List<Trip>,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
         // TODO: Add view for when list is empty
-        items(tripsForPreview) { item ->
+        items(items) { item ->
             TripListCard(
                 item.name,
                 item.startDate,
@@ -42,7 +45,12 @@ fun TripList(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TripListCard(tripName: String, tripStartDate: String, tripTotal: Double, onClick: () -> Unit) {
+fun TripListCard(
+    tripName: String,
+    tripStartDate: String,
+    tripTotal: Double,
+    onClick: () -> Unit,
+) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +83,9 @@ fun TripListCard(tripName: String, tripStartDate: String, tripTotal: Double, onC
 @Composable
 fun TripListPreview() {
     ReceiptTrackerTheme {
-        TripList()
+        TripList(
+            items = tripsForPreview
+        )
     }
 }
 
