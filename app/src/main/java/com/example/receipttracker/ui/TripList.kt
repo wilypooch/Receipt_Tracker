@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +31,8 @@ fun TripList(
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // TODO: Add view for when list is empty
         items(items) { item ->
@@ -54,7 +55,7 @@ fun TripListCard(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 8.dp),
         onClick = { TODO() }) {
         Row {
             Text(tripName, style = MaterialTheme.typography.titleLarge)
