@@ -47,4 +47,9 @@ fun ReceiptTrackerApp() {
         }
     )
 }
+
+// TODO: Move this composable to UI screen and develop further
+@Composable
+fun TripDetailScreen(tripId: Int, onNavigateUp: () -> Any?) {
+    Text(text = "Trip Details for $tripId")
 }
