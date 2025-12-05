@@ -26,6 +26,7 @@ private val tripsForPreview = listOf(
 @Composable
 fun TripList(
     items: List<Trip>,
+    onTripClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -40,6 +41,7 @@ fun TripList(
                 item.startDate,
                 item.totalAmount
             ) {} //TODO: Do I need to do anything with this lambda??
+                onClick = { onTripClick(item.tripId) }
         }
     }
 }
@@ -55,7 +57,8 @@ fun TripListCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        onClick = { TODO() }) {
+        onClick = onClick
+    ) {
         Row {
             Text(tripName, style = MaterialTheme.typography.titleLarge)
         }
@@ -84,7 +87,7 @@ fun TripListCard(
 fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
-            items = tripsForPreview
+            items = tripsForPreview, onTripClick = {}
         )
     }
 }
