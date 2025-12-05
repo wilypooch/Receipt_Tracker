@@ -17,7 +17,7 @@ data class TripDetailsUiState(
     val totalAmount: String = "", // TODO: String for TextFields but has been defined as Double elsewhere
 )
 
-class TripViewModel(private val repository: TrackerRepository) : ViewModel() {
+class TripDetailsViewModel(private val repository: TrackerRepository) : ViewModel() {
 
     val homeListState: StateFlow<List<Trip>> = repository.getAllTripsByDateAscStream().stateIn(
         scope = viewModelScope,
