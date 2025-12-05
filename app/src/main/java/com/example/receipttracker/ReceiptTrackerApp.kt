@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.HomeScreen
+import com.example.receipttracker.ui.TripDetailScreen
 
 data object TripList
 data class TripDetail(val id: Int)
@@ -46,10 +47,4 @@ fun ReceiptTrackerApp() {
             }
         }
     )
-}
-
-// TODO: Move this composable to UI screen and develop further
-@Composable
-fun TripDetailScreen(tripId: Int, onNavigateUp: () -> Any?) {
-    Text(text = "Trip Details for $tripId")
 }
