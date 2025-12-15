@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val trips: List<Trip> = emptyList(),
@@ -26,6 +27,10 @@ class HomeViewModel(
                 HomeUiState()
             )
 
-    // TODO: Bonus feature: Add swipe to delete functionality logic for Home Screen
+    fun deleteTrip(trip: Trip) {
+        viewModelScope.launch {
+            repository.deleteTrip(trip)
+        }
+    }
 }
 
