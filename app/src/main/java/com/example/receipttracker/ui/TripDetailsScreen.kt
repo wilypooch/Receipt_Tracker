@@ -3,10 +3,11 @@ package com.example.receipttracker.ui
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
 @Composable
-fun TripDetailScreen(tripId: Int, onNavigateUp: () -> Any?) {
+fun TripDetailScreen(tripId: Int, viewModel: TripDetailsViewModel, onNavigateUp: () -> Any?) {
     Text(text = "Trip Details for $tripId")
 }
 
@@ -14,6 +15,6 @@ fun TripDetailScreen(tripId: Int, onNavigateUp: () -> Any?) {
 @Composable
 fun TripDetailsScreenPreview() {
     ReceiptTrackerTheme {
-        TripDetailScreen(tripId = 67, onNavigateUp = {})
+        TripDetailScreen(tripId = 67, viewModel = viewModel(), onNavigateUp = {})
     }
 }
