@@ -1,20 +1,11 @@
 package com.example.receipttracker.ui
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.receipttracker.data.Trip
-import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
 private val tripsForPreview = listOf(
     Trip(23, "SANSHOME", "01/02/23", endDate = "08/03/1993", 400.00),
@@ -25,39 +16,28 @@ private val tripsForPreview = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onAddTripClick: () -> Unit,
+    viewModel: HomeViewModel,
     onViewTripClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = "Home",
-                    style = MaterialTheme.typography.headlineMedium,
-                )
-            })
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { onAddTripClick() }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Trip")
-            }
-        }) { innerPadding ->
-        TripList(
-            items = tripsForPreview,
-            onTripClick = onViewTripClick,
-            modifier = Modifier.padding(innerPadding)
-        )
-    }
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    TripList(
+        items = uiState.trips,
+        onTripClick = onViewTripClick,
+        onDeleteTrip = viewModel::deleteTrip,
+        modifier = modifier
+    )
+
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    ReceiptTrackerTheme {
-        HomeScreen(
-            {},
-            {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    ReceiptTrackerTheme {
+//        HomeScreen(
+//        )
+//    }
+//}
