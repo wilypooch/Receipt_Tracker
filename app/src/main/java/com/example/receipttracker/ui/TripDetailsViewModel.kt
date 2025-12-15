@@ -93,6 +93,10 @@ class TripDetailsViewModel(
         }
     }
 
+    fun deleteTrip() {
+        // TODO: Add functionality for delete trip
+    }
+
     @Suppress("UNCHECKED_CAST")
     companion object {
         fun provideFactory(tripId: Int, repository: TrackerRepository): ViewModelProvider.Factory =
