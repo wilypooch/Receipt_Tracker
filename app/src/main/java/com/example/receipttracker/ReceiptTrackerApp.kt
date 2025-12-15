@@ -48,7 +48,6 @@ fun ReceiptTrackerApp() {
                         viewModel(factory = TripDetailsViewModel.provideFactory(tripId, repository))
 
                     TripDetailScreen(
-                        tripId = tripId,
                         viewModel = viewModel,
                         onNavigateUp = { backStack.removeLastOrNull() }
                     )

@@ -9,6 +9,7 @@ import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 @Composable
 fun TripDetailScreen(tripId: Int, viewModel: TripDetailsViewModel, onNavigateUp: () -> Any?) {
     Text(text = "Trip Details for $tripId")
+fun TripDetailScreen(viewModel: TripDetailsViewModel, onNavigateUp: () -> Unit) {
 }
 
 @Preview(showBackground = true)
