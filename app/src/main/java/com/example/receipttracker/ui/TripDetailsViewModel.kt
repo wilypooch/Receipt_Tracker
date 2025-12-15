@@ -51,22 +51,22 @@ class TripDetailsViewModel(
         }
     }
 
-    fun onNameChanged(value: String) {
+    fun onNameChange(value: String) {
         _currentTripUiState.value =
             _currentTripUiState.value.copy(name = value)
     }
 
-    fun onStartDateChanged(value: String) {
+    fun onStartDateChange(value: String) {
         _currentTripUiState.value =
             _currentTripUiState.value.copy(startDate = value)
     }
 
-    fun onEndDateChanged(value: String) {
+    fun onEndDateChange(value: String) {
         _currentTripUiState.value =
             _currentTripUiState.value.copy(endDate = value)
     }
 
-    fun onTotalAmountChanged(value: String) {
+    fun onTotalAmountChange(value: String) {
         _currentTripUiState.value =
             _currentTripUiState.value.copy(totalAmount = value)
     }
