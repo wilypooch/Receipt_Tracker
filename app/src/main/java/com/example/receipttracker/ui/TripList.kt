@@ -28,6 +28,7 @@ private val tripsForPreview = listOf(
 fun TripList(
     items: List<Trip>,
     onTripClick: (Int) -> Unit,
+    onDeleteTrip: (Trip) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -37,6 +38,8 @@ fun TripList(
     ) {
         // TODO: Add view for when list is empty
         items(items) { item ->
+
+            // TODO: Add swipe to delete functionality
             TripListCard(
                 tripName = item.name,
                 tripStartDate = item.startDate,
@@ -89,7 +92,7 @@ fun TripListCard(
 fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
-            items = tripsForPreview, onTripClick = {}
+            items = tripsForPreview, onTripClick = {}, onDeleteTrip = {}
         )
     }
 }
