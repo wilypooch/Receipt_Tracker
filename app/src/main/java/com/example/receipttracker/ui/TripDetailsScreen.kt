@@ -3,6 +3,7 @@ package com.example.receipttracker.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.receipttracker.R
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
 @Composable
@@ -58,12 +61,25 @@ fun TripDetailContent(
             value = uiState.startDate,
             label = { Text("Start Date") },
             onValueChange = onStartDateChange,
+            trailingIcon = {
+                Icon(
+                    painterResource(R.drawable.ic_calendar_today),
+                    contentDescription = "Select Start Date"
+                )
+            }
+
         )
 
         OutlinedTextField(
             value = uiState.endDate,
             label = { Text("End Date") },
             onValueChange = onEndDateChange,
+            trailingIcon = {
+                Icon(
+                    painterResource(R.drawable.ic_calendar_today),
+                    contentDescription = "Select End Date"
+                )
+            }
         )
 
         OutlinedTextField(
