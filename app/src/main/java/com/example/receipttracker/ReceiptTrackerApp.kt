@@ -79,9 +79,15 @@ fun ReceiptTrackerApp() {
                         val application = context.applicationContext as ReceiptTrackerApplication
                         val repository = application.container.trackerRepository
 
+                        val viewModelKey = if (tripId == -1) {
+                            "TripDetailVM_New_${java.util.UUID.randomUUID()}"
+                        } else {
+                            "TripDetailVM_$tripId"
+                        }
+
                         val viewModel: TripDetailsViewModel =
                             viewModel(
-                                key = "TripDetailVM_$tripId",
+                                key = viewModelKey,
                                 factory = TripDetailsViewModel.provideFactory(
                                     tripId,
                                     repository
