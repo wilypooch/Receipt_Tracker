@@ -81,6 +81,7 @@ fun ReceiptTrackerApp() {
 
                         val viewModel: TripDetailsViewModel =
                             viewModel(
+                                key = "TripDetailVM_$tripId",
                                 factory = TripDetailsViewModel.provideFactory(
                                     tripId,
                                     repository
