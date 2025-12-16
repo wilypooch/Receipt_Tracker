@@ -36,9 +36,7 @@ fun TripList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // TODO: Add view for when list is empty
         items(items) { item ->
-
             // TODO: Add swipe to delete functionality
             TripListCard(
                 tripName = item.name,
