@@ -73,7 +73,6 @@ class TripDetailsViewModel(
 
     fun saveTrip() {
         val ui = _currentTripUiState.value
-
         val amount = ui.totalAmount.toDoubleOrNull() ?: 0.0
 
         val trip = Trip(
