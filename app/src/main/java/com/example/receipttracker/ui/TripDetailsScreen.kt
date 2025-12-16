@@ -28,6 +28,7 @@ fun TripDetailScreen(viewModel: TripDetailsViewModel, onNavigateUp: () -> Unit) 
             onNavigateUp()
         },
         onDeleteClick = {
+            // TODO: Add warning toast asking for confirmation
             viewModel.deleteTrip()
             onNavigateUp()
         }

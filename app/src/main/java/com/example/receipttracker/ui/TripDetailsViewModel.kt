@@ -93,7 +93,19 @@ class TripDetailsViewModel(
     }
 
     fun deleteTrip() {
-        // TODO: Add functionality for delete trip
+        if (isNewTrip) return
+
+        val tripToDelete = Trip(
+            tripId = this.tripId,
+            name = _currentTripUiState.value.name,
+            startDate = _currentTripUiState.value.startDate,
+            endDate = _currentTripUiState.value.endDate,
+            totalAmount = _currentTripUiState.value.totalAmount.toDoubleOrNull() ?: 0.0
+        )
+
+        viewModelScope.launch {
+            repository.deleteTrip(tripToDelete)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
