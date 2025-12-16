@@ -3,6 +3,8 @@ package com.example.receipttracker
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -25,13 +27,15 @@ import com.example.receipttracker.ui.TripDetailsViewModel
 data object TripList
 data class TripDetail(val id: Int)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UNCHECKED_CAST")
 @Composable
 fun ReceiptTrackerApp() {
     val backStack = remember { mutableStateListOf<Any>(TripList) }
     val currentScreen = backStack.lastOrNull() ?: TripList
     Scaffold(
-        topBar = { TODO() },
+        //TODO: Add adaptive top bar title functionality
+        topBar = { CenterAlignedTopAppBar(title = { Text("PLACEHOLDER TITLE, CHANGE ME") }) },
         floatingActionButton = {
             if (currentScreen is TripList) {
                 // TODO: perhaps change this ID, it doesn't feel right
