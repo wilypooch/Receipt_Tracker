@@ -3,8 +3,10 @@ package com.example.receipttracker.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +30,7 @@ private val tripsForPreview = listOf(
 fun TripList(
     items: List<Trip>,
     onTripClick: (Int) -> Unit,
+    onDeleteTrip: (Trip) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -35,8 +38,8 @@ fun TripList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // TODO: Add view for when list is empty
         items(items) { item ->
+            // TODO: Add swipe to delete functionality
             TripListCard(
                 tripName = item.name,
                 tripStartDate = item.startDate,
@@ -61,24 +64,27 @@ fun TripListCard(
             .padding(horizontal = 8.dp),
         onClick = onClick
     ) {
-        Row {
-            Text(tripName, style = MaterialTheme.typography.titleLarge)
-        }
-        Row {
-            Column(modifier.weight(2f)) {
-                Text(text = "Start Date:", style = MaterialTheme.typography.labelMedium)
+        Column(modifier = modifier.padding(16.dp)) {
+            Row {
+                Text(tripName, style = MaterialTheme.typography.titleLarge)
             }
-            Column {
-                Text(text = tripStartDate, style = MaterialTheme.typography.labelMedium)
+            Spacer(modifier.height(8.dp))
+            Row {
+                Column(modifier.weight(2f)) {
+                    Text(text = "Start Date:", style = MaterialTheme.typography.labelMedium)
+                }
+                Column {
+                    Text(text = tripStartDate, style = MaterialTheme.typography.labelMedium)
+                }
             }
-        }
-        Row {
-            Column(modifier.weight(2f)) {
-                Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
-            }
-            Column {
-                // TODO: Format currency
-                Text(text = tripTotal.toString(), style = MaterialTheme.typography.labelMedium)
+            Row {
+                Column(modifier.weight(2f)) {
+                    Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
+                }
+                Column {
+                    // TODO: Format currency
+                    Text(text = tripTotal.toString(), style = MaterialTheme.typography.labelMedium)
+                }
             }
         }
     }
@@ -89,7 +95,7 @@ fun TripListCard(
 fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
-            items = tripsForPreview, onTripClick = {}
+            items = tripsForPreview, onTripClick = {}, onDeleteTrip = {}
         )
     }
 }
