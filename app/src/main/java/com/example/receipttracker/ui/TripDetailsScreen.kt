@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
+import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import java.util.Date
 import java.util.Locale
 
@@ -69,7 +70,6 @@ fun TripDetailScreen(viewModel: TripDetailsViewModel, onNavigateUp: () -> Unit) 
             onNavigateUp()
         },
         onDeleteClick = {
-            // TODO: Add warning toast asking for confirmation
             viewModel.deleteTrip()
             onNavigateUp()
         }
@@ -99,6 +99,7 @@ fun TripDetailContent(
         }
     }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -106,13 +107,11 @@ fun TripDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Trip Details")
-
         OutlinedTextField(
             value = uiState.name,
             label = { Text("Trip Name") },
             onValueChange = onNameChange,
         )
-
         OutlinedTextField(
             value = uiState.startDate,
             label = { Text("Start Date") },
@@ -133,7 +132,6 @@ fun TripDetailContent(
                 }
             }
         )
-
         OutlinedTextField(
             value = uiState.endDate,
             label = { Text("End Date") },
@@ -154,26 +152,28 @@ fun TripDetailContent(
                 }
             }
         )
-
         OutlinedTextField(
             value = uiState.totalAmount,
             label = { Text("Total Amount") },
             onValueChange = onAmountChange,
         )
-
         Button(
             onClick = onSaveClick,
         ) {
             Text("Save")
         }
-
         Button(
-            onClick = onDeleteClick,
+            onClick = { showDeleteDialog = true }
         ) {
             Text("Delete")
         }
+        if (showDeleteDialog) {
+            DeleteAlertDialog(
+                onDismiss = { showDeleteDialog = false },
+                onConfirmDelete = onDeleteClick
+            )
+        }
     }
-
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
