@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
@@ -55,25 +60,46 @@ fun convertDateStringToMillis(dateString: String): Long? {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TripDetailScreen(viewModel: TripDetailsViewModel, onNavigateUp: () -> Unit) {
-    val uiState by viewModel.currentTripUiState.collectAsState()
-
-    TripDetailContent(
-        uiState = uiState,
-        onNameChange = viewModel::onNameChange,
-        onStartDateChange = viewModel::onStartDateChange,
-        onEndDateChange = viewModel::onEndDateChange,
-        onAmountChange = viewModel::onTotalAmountChange,
-        onSaveClick = {
-            viewModel.saveTrip()
-            onNavigateUp()
-        },
-        onDeleteClick = {
-            viewModel.deleteTrip()
-            onNavigateUp()
+fun TripDetailScreen(
+    viewModel: TripDetailsViewModel,
+    onNavigateUp: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Trip Details") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         }
-    )
+    ) { innerPadding ->
+        val uiState by viewModel.currentTripUiState.collectAsState()
+
+        TripDetailContent(
+            uiState = uiState,
+            onNameChange = viewModel::onNameChange,
+            onStartDateChange = viewModel::onStartDateChange,
+            onEndDateChange = viewModel::onEndDateChange,
+            onAmountChange = viewModel::onTotalAmountChange,
+            onSaveClick = {
+                viewModel.saveTrip()
+                onNavigateUp()
+            },
+            onDeleteClick = {
+                viewModel.deleteTrip()
+                onNavigateUp()
+            },
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
 }
 
 @Composable
@@ -85,6 +111,7 @@ fun TripDetailContent(
     onAmountChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
     val startMillis = remember(uiState.startDate) {
@@ -103,10 +130,9 @@ fun TripDetailContent(
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Trip Details")
         OutlinedTextField(
             value = uiState.name,
             label = { Text("Trip Name") },
@@ -247,6 +273,7 @@ fun TripDetailsContentPreview() {
             onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
+            modifier = Modifier,
         )
     }
 }
@@ -263,6 +290,7 @@ fun TripDetailNewPreview() {
             onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
+            modifier = Modifier,
         )
     }
 }
