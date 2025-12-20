@@ -3,6 +3,7 @@ package com.example.receipttracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.data.TrackerRepository
 import com.example.receipttracker.data.Trip
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 data class TripDetailsUiState(
     val name: String = "",
@@ -105,6 +107,19 @@ class TripDetailsViewModel(
 
         viewModelScope.launch {
             repository.deleteTrip(tripToDelete)
+        }
+    }
+
+    fun addReceipt(tripId: Int, imagePath: String, amount: Double, notes: String) {
+        viewModelScope.launch {
+            val receipt = Receipt(
+                tripId = tripId,
+                date = LocalDate.now().toString(), // TODO: May need to be reformatted, looks to simplistic but seems to work
+                imageUri = imagePath,
+                amount = amount,
+                notes = notes
+            )
+            repository.insertReceipt(receipt)
         }
     }
 
