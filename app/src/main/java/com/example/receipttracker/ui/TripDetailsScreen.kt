@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -94,22 +96,36 @@ fun TripDetailScreen(
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
-        TripDetailContent(
-            uiState = uiState,
-            onNameChange = viewModel::onNameChange,
-            onStartDateChange = viewModel::onStartDateChange,
-            onEndDateChange = viewModel::onEndDateChange,
-            onAmountChange = viewModel::onTotalAmountChange,
-            onSaveClick = {
-                viewModel.saveTrip()
-                onNavigateUp()
-            },
-            onDeleteClick = {
-                viewModel.deleteTrip()
-                onNavigateUp()
-            },
-            modifier = Modifier.padding(innerPadding),
-        )
+        // TODO: Add functionality to deal with screen rotation / different screen sizes
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            TripDetailContent(
+                uiState = uiState,
+                onNameChange = viewModel::onNameChange,
+                onStartDateChange = viewModel::onStartDateChange,
+                onEndDateChange = viewModel::onEndDateChange,
+                onAmountChange = viewModel::onTotalAmountChange,
+                onSaveClick = {
+                    viewModel.saveTrip()
+                    onNavigateUp()
+                },
+                onDeleteClick = {
+                    viewModel.deleteTrip()
+                    onNavigateUp()
+                },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+
+            ReceiptList(
+                items = uiState.receipts,
+                onReceiptClick = { TODO() },
+                onDeleteReceipt = { TODO() },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
@@ -149,7 +165,9 @@ fun TripDetailContent(
     }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
