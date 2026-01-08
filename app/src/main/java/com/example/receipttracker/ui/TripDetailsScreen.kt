@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -37,9 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
+import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import java.util.Date
@@ -89,7 +92,7 @@ fun TripDetailScreen(
             }
         }
     ) { innerPadding ->
-        val uiState by viewModel.currentTripUiState.collectAsState()
+        val uiState by viewModel.uiState.collectAsState()
 
         TripDetailContent(
             uiState = uiState,
@@ -116,17 +119,17 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
-    onAmountChange: (String) -> Unit,
+    onAmountChange: (Double) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
-    val startMillis = remember(uiState.startDate) {
-        convertDateStringToMillis(uiState.startDate)
+    val startMillis = remember(uiState.trip.startDate) {
+        convertDateStringToMillis(uiState.trip.startDate)
     }
-    val endMillis = remember(uiState.endDate) {
-        convertDateStringToMillis(uiState.endDate)
+    val endMillis = remember(uiState.trip.endDate) {
+        convertDateStringToMillis(uiState.trip.endDate)
     }
     LaunchedEffect(startMillis, endMillis) {
         if (startMillis != null && endMillis != null) {
@@ -137,17 +140,25 @@ fun TripDetailContent(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
+    var amountText by remember { mutableStateOf("") }
+    LaunchedEffect(uiState.trip.totalAmount) {
+        val vmAmount = uiState.trip.totalAmount
+        if (vmAmount.toString() != amountText) {
+            amountText = if (vmAmount == 0.0) "" else vmAmount.toString()
+        }
+    }
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = uiState.name,
+            value = uiState.trip.name,
             label = { Text("Trip Name") },
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = uiState.startDate,
+            value = uiState.trip.startDate,
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -167,7 +178,7 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = uiState.endDate,
+            value = uiState.trip.endDate,
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
@@ -187,9 +198,17 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = uiState.totalAmount,
+            value = amountText,
             label = { Text("Total Amount") },
-            onValueChange = onAmountChange,
+            onValueChange = { newText ->
+                amountText = newText
+
+                val newAmount = newText.toDoubleOrNull()
+                if (newAmount != null) {
+                    onAmountChange(newAmount)
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Button(
             onClick = onSaveClick,
@@ -266,10 +285,12 @@ fun TripDateRangePicker(state: DateRangePickerState) {
 @Composable
 fun TripDetailsContentPreview() {
     val sampleState = TripDetailsUiState(
-        name = "Rust Training In Manchester",
-        startDate = "01/10/2025",
-        endDate = "07/10/2025",
-        totalAmount = "2500.00"
+        Trip(
+            name = "Rust Training In Manchester",
+            startDate = "01/10/2025",
+            endDate = "07/10/2025",
+            totalAmount = 2500.00
+        )
     )
 
     ReceiptTrackerTheme {
