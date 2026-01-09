@@ -3,22 +3,24 @@ package com.example.receipttracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.data.TrackerRepository
 import com.example.receipttracker.data.Trip
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 data class TripDetailsUiState(
-    val name: String = "",
-    val startDate: String = "",
-    val endDate: String = "",
-    val totalAmount: String = "", // TODO: String for TextFields but has been defined as Double elsewhere
+    val trip: Trip = Trip(),
+    val receipts: List<Receipt> = emptyList(),
 )
-
 
 class TripDetailsViewModel(
     private val tripId: Int,
@@ -27,84 +29,86 @@ class TripDetailsViewModel(
     ViewModel() {
 
     private val isNewTrip = tripId == -1
-    private val _currentTripUiState = MutableStateFlow(TripDetailsUiState())
-    val currentTripUiState: StateFlow<TripDetailsUiState> = _currentTripUiState.asStateFlow()
+    private val _userEdits = MutableStateFlow(Trip())
+    val uiState: StateFlow<TripDetailsUiState> = createUiStateStream()
 
-    init {
-        if (!isNewTrip) {
-            loadTrip(tripId)
-        }
-    }
-
-    private fun loadTrip(id: Int) {
-        viewModelScope.launch {
-            val trip = repository.getTripStream(id)
-                .filterNotNull()
-                .first()
-            _currentTripUiState.value = TripDetailsUiState(
-                name = trip.name,
-                startDate = trip.startDate,
-                endDate = trip.endDate,
-                totalAmount = trip.totalAmount.toString()
+    private fun createUiStateStream(): StateFlow<TripDetailsUiState> {
+        return if (isNewTrip) {
+            _userEdits.map { editedTrip -> TripDetailsUiState(trip = editedTrip) }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = TripDetailsUiState()
             )
-
+        } else {
+            val tripFromDbStream = repository.getTripStream(tripId).filterNotNull()
+            val receiptsFromDbStream = repository.getAllReceiptsForTripStream(tripId)
+            combine(
+                tripFromDbStream,
+                receiptsFromDbStream,
+                _userEdits
+            ) { tripFromDb, receipts, edits ->
+                TripDetailsUiState(
+                    trip = tripFromDb.copy(
+                        name = edits.name.takeIf { it.isNotBlank() } ?: tripFromDb.name,
+                        startDate = edits.startDate.takeIf { it.isNotBlank() }
+                            ?: tripFromDb.startDate,
+                        endDate = edits.endDate.takeIf { it.isNotBlank() } ?: tripFromDb.endDate,
+                    ),
+                    receipts = receipts
+                )
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = TripDetailsUiState()
+            )
         }
     }
 
     fun onNameChange(value: String) {
-        _currentTripUiState.value =
-            _currentTripUiState.value.copy(name = value)
+        _userEdits.update { it.copy(name = value) }
     }
 
     fun onStartDateChange(value: String) {
-        _currentTripUiState.value =
-            _currentTripUiState.value.copy(startDate = value)
+        _userEdits.update { it.copy(startDate = value) }
     }
 
     fun onEndDateChange(value: String) {
-        _currentTripUiState.value =
-            _currentTripUiState.value.copy(endDate = value)
+        _userEdits.update { it.copy(endDate = value) }
     }
 
-    fun onTotalAmountChange(value: String) {
-        _currentTripUiState.value =
-            _currentTripUiState.value.copy(totalAmount = value)
+    fun onTotalAmountChange(value: Double) {
+        _userEdits.update { it.copy(totalAmount = value) }
     }
 
     fun saveTrip() {
-        val ui = _currentTripUiState.value
-        val amount = ui.totalAmount.toDoubleOrNull() ?: 0.0
-
-        val trip = Trip(
-            tripId = if (isNewTrip) 0 else tripId,  // 0 → Let Room autogenerate
-            name = ui.name,
-            startDate = ui.startDate,
-            endDate = ui.endDate,
-            totalAmount = amount
-        )
-
         viewModelScope.launch {
+            val editedTrip = _userEdits.value
             if (isNewTrip) {
-                repository.insertTrip(trip)
+                repository.insertTrip(editedTrip)
             } else {
-                repository.updateTrip(trip)
+                repository.updateTrip(editedTrip.copy(tripId = this@TripDetailsViewModel.tripId))
             }
         }
     }
 
     fun deleteTrip() {
         if (isNewTrip) return
-
-        val tripToDelete = Trip(
-            tripId = this.tripId,
-            name = _currentTripUiState.value.name,
-            startDate = _currentTripUiState.value.startDate,
-            endDate = _currentTripUiState.value.endDate,
-            totalAmount = _currentTripUiState.value.totalAmount.toDoubleOrNull() ?: 0.0
-        )
-
         viewModelScope.launch {
-            repository.deleteTrip(tripToDelete)
+            repository.deleteTrip(Trip(tripId = tripId))
+        }
+    }
+
+    fun addReceipt(tripId: Int, imagePath: String, amount: Double, notes: String) {
+        viewModelScope.launch {
+            val receipt = Receipt(
+                tripId = tripId,
+                date = LocalDate.now()
+                    .toString(), // TODO: May need to be reformatted, looks to simplistic but seems to work
+                imageUri = imagePath,
+                amount = amount,
+                notes = notes
+            )
+            repository.insertReceipt(receipt)
         }
     }
 
@@ -117,5 +121,4 @@ class TripDetailsViewModel(
                 }
             }
     }
-
 }

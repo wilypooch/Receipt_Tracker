@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
+import com.example.receipttracker.ui.AddReceiptScreen
 import com.example.receipttracker.ui.HomeScreen
 import com.example.receipttracker.ui.HomeViewModel
 import com.example.receipttracker.ui.TripDetailScreen
@@ -18,6 +19,8 @@ import java.util.UUID
 
 data object TripList
 data class TripDetail(val id: Int)
+data class AddReceipt(val tripId: Int)
+
 
 @Suppress("UNCHECKED_CAST")
 @Composable
@@ -25,12 +28,14 @@ fun ReceiptTrackerApp() {
     val backStack = remember { mutableStateListOf<Any>(TripList) }
     NavDisplay(
         backStack = backStack,
+        // TODO: fix this onBack implementation as it is not currently used within the entry provider and code is duplicated.
         onBack = { backStack.removeLastOrNull() },
         entryProvider = { key ->
             when (key) {
                 is TripList -> NavEntry(key) {
                     val context = LocalContext.current
                     val app = context.applicationContext as ReceiptTrackerApplication
+                    // TODO: Abstract this ViewModel Factory implementation away from the NavDisplay
                     val homeViewModel: HomeViewModel = viewModel(
                         factory = object : ViewModelProvider.Factory {
                             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -53,6 +58,7 @@ fun ReceiptTrackerApp() {
 
                 is TripDetail -> NavEntry(key) {
                     val tripId = key.id
+                    // TODO: fix the duplication of this code here and in the AddReceipt implementation
                     val context = LocalContext.current
                     val application = context.applicationContext as ReceiptTrackerApplication
                     val repository = application.container.trackerRepository
@@ -72,7 +78,30 @@ fun ReceiptTrackerApp() {
                         )
                     TripDetailScreen(
                         viewModel = viewModel,
-                        onNavigateUp = { backStack.removeLastOrNull() }
+                        onNavigateUp = { backStack.removeLastOrNull() },
+                        onAddReceiptClick = {
+                            backStack.add(AddReceipt(tripId))
+                        }
+                    )
+                }
+
+                is AddReceipt -> NavEntry(key) {
+                    val tripId = key.tripId
+                    val context = LocalContext.current
+                    val application = context.applicationContext as ReceiptTrackerApplication
+                    val repository = application.container.trackerRepository
+
+                    // Reusing Trip ViewModel
+                    val viewModelKey = "TripDetailVM_$tripId"
+
+                    val viewModel: TripDetailsViewModel = viewModel(
+                        key = viewModelKey,
+                        factory = TripDetailsViewModel.provideFactory(tripId, repository)
+                    )
+                    AddReceiptScreen(
+                        tripId = tripId,
+                        viewModel = viewModel,
+                        onReceiptSaved = { backStack.removeLastOrNull() }
                     )
                 }
 

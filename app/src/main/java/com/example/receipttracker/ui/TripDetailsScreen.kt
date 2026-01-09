@@ -8,14 +8,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -38,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
+import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import java.util.Date
@@ -65,6 +70,7 @@ fun convertDateStringToMillis(dateString: String): Long? {
 fun TripDetailScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: () -> Unit,
+    onAddReceiptClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -79,26 +85,44 @@ fun TripDetailScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddReceiptClick) {
+                Icon(Icons.Filled.Add, "Add Receipt")
+            }
         }
     ) { innerPadding ->
-        val uiState by viewModel.currentTripUiState.collectAsState()
+        val uiState by viewModel.uiState.collectAsState()
 
-        TripDetailContent(
-            uiState = uiState,
-            onNameChange = viewModel::onNameChange,
-            onStartDateChange = viewModel::onStartDateChange,
-            onEndDateChange = viewModel::onEndDateChange,
-            onAmountChange = viewModel::onTotalAmountChange,
-            onSaveClick = {
-                viewModel.saveTrip()
-                onNavigateUp()
-            },
-            onDeleteClick = {
-                viewModel.deleteTrip()
-                onNavigateUp()
-            },
-            modifier = Modifier.padding(innerPadding),
-        )
+        // TODO: Add functionality to deal with screen rotation / different screen sizes
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            TripDetailContent(
+                uiState = uiState,
+                onNameChange = viewModel::onNameChange,
+                onStartDateChange = viewModel::onStartDateChange,
+                onEndDateChange = viewModel::onEndDateChange,
+                onSaveClick = {
+                    viewModel.saveTrip()
+                    onNavigateUp()
+                },
+                onDeleteClick = {
+                    viewModel.deleteTrip()
+                    onNavigateUp()
+                },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+
+            ReceiptList(
+                items = uiState.receipts,
+                onReceiptClick = { TODO() },
+                onDeleteReceipt = { TODO() },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
@@ -108,17 +132,16 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
-    onAmountChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
-    val startMillis = remember(uiState.startDate) {
-        convertDateStringToMillis(uiState.startDate)
+    val startMillis = remember(uiState.trip.startDate) {
+        convertDateStringToMillis(uiState.trip.startDate)
     }
-    val endMillis = remember(uiState.endDate) {
-        convertDateStringToMillis(uiState.endDate)
+    val endMillis = remember(uiState.trip.endDate) {
+        convertDateStringToMillis(uiState.trip.endDate)
     }
     LaunchedEffect(startMillis, endMillis) {
         if (startMillis != null && endMillis != null) {
@@ -129,17 +152,27 @@ fun TripDetailContent(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
+    var amountText by remember { mutableStateOf("") }
+    LaunchedEffect(uiState.trip.totalAmount) {
+        val vmAmount = uiState.trip.totalAmount
+        if (vmAmount.toString() != amountText) {
+            amountText = if (vmAmount == 0.0) "" else vmAmount.toString()
+        }
+    }
+
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = uiState.name,
+            value = uiState.trip.name,
             label = { Text("Trip Name") },
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = uiState.startDate,
+            value = uiState.trip.startDate,
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -159,7 +192,7 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = uiState.endDate,
+            value = uiState.trip.endDate,
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
@@ -178,17 +211,15 @@ fun TripDetailContent(
                 }
             }
         )
-        OutlinedTextField(
-            value = uiState.totalAmount,
-            label = { Text("Total Amount") },
-            onValueChange = onAmountChange,
-        )
+
         Button(
+            // TODO: Disable until fields are full
             onClick = onSaveClick,
         ) {
             Text("Save")
         }
         Button(
+            // TODO: Disable unless trip already in database
             onClick = { showDeleteDialog = true }
         ) {
             Text("Delete")
@@ -258,10 +289,12 @@ fun TripDateRangePicker(state: DateRangePickerState) {
 @Composable
 fun TripDetailsContentPreview() {
     val sampleState = TripDetailsUiState(
-        name = "Rust Training In Manchester",
-        startDate = "01/10/2025",
-        endDate = "07/10/2025",
-        totalAmount = "2500.00"
+        Trip(
+            name = "Rust Training In Manchester",
+            startDate = "01/10/2025",
+            endDate = "07/10/2025",
+            totalAmount = 2500.00
+        )
     )
 
     ReceiptTrackerTheme {
@@ -270,7 +303,6 @@ fun TripDetailsContentPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
             modifier = Modifier,
@@ -287,7 +319,6 @@ fun TripDetailNewPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
             modifier = Modifier,

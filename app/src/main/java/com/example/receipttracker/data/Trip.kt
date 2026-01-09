@@ -10,11 +10,11 @@ data class Trip(
     @ColumnInfo(name = "trip_id")
     val tripId: Int = 0,
     @ColumnInfo(name = "name")
-    val name: String,
+    val name: String = "",
     @ColumnInfo(name = "start_date")
-    val startDate: String,
+    val startDate: String = "",
     @ColumnInfo(name = "end_date")
-    val endDate: String,
+    val endDate: String = "",
     @ColumnInfo(name = "total_amount")
-    val totalAmount: Double,
+    val totalAmount: Double = 0.0,
 )
