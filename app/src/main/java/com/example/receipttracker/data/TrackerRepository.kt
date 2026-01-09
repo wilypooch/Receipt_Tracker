@@ -13,5 +13,5 @@ interface TrackerRepository {
     fun getAllReceiptsForTripStream(id: Int): Flow<List<Receipt>>
     suspend fun insertReceipt(receipt: Receipt)
     suspend fun updateReceipt(receipt: Receipt)
-    suspend fun deleteReceipt(receipt: Receipt)
+    suspend fun deleteReceiptById(id: Int)
 }

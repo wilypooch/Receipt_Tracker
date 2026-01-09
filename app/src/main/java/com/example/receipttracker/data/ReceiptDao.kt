@@ -1,7 +1,6 @@
 package com.example.receipttracker.data
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -16,8 +15,8 @@ interface ReceiptDao {
     @Update
     suspend fun update(receipt: Receipt)
 
-    @Delete
-    suspend fun delete(receipt: Receipt)
+    @Query("DELETE FROM receipt WHERE receipt_id = :id")
+    suspend fun deleteById(id: Int)
 
     @Query("SELECT * FROM receipt WHERE receipt_id = :id")
     fun getReceipt(id: Int): Flow<Receipt?>

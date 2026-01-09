@@ -31,6 +31,6 @@ class OfflineTrackerRepository(private val tripDao: TripDao, private val receipt
     override suspend fun updateReceipt(receipt: Receipt) =
         receiptDao.update(receipt)
 
-    override suspend fun deleteReceipt(receipt: Receipt) =
-        receiptDao.delete(receipt)
+    override suspend fun deleteReceiptById(id: Int) =
+        receiptDao.deleteById(id)
 }
