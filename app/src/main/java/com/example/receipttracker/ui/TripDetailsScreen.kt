@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -40,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
@@ -107,7 +105,6 @@ fun TripDetailScreen(
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
-                onAmountChange = viewModel::onTotalAmountChange,
                 onSaveClick = {
                     viewModel.saveTrip()
                     onNavigateUp()
@@ -135,7 +132,6 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
-    onAmountChange: (Double) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier,
@@ -215,25 +211,15 @@ fun TripDetailContent(
                 }
             }
         )
-        OutlinedTextField(
-            value = amountText,
-            label = { Text("Total Amount") },
-            onValueChange = { newText ->
-                amountText = newText
 
-                val newAmount = newText.toDoubleOrNull()
-                if (newAmount != null) {
-                    onAmountChange(newAmount)
-                }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
         Button(
+            // TODO: Disable until fields are full
             onClick = onSaveClick,
         ) {
             Text("Save")
         }
         Button(
+            // TODO: Disable unless trip already in database
             onClick = { showDeleteDialog = true }
         ) {
             Text("Delete")
@@ -317,7 +303,6 @@ fun TripDetailsContentPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
             modifier = Modifier,
@@ -334,7 +319,6 @@ fun TripDetailNewPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onAmountChange = {},
             onSaveClick = {},
             onDeleteClick = {},
             modifier = Modifier,
