@@ -76,6 +76,7 @@ class TripDetailsViewModel(
         _userEdits.update { it.copy(endDate = value) }
     }
 
+    // TODO: Looks like this will need amending / removing as user no longer manually edits total trip amount
     fun onTotalAmountChange(value: Double) {
         _userEdits.update { it.copy(totalAmount = value) }
     }
