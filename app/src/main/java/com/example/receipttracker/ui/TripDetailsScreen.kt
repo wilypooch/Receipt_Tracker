@@ -152,14 +152,6 @@ fun TripDetailContent(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    var amountText by remember { mutableStateOf("") }
-    LaunchedEffect(uiState.trip.totalAmount) {
-        val vmAmount = uiState.trip.totalAmount
-        if (vmAmount.toString() != amountText) {
-            amountText = if (vmAmount == 0.0) "" else vmAmount.toString()
-        }
-    }
-
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp)
