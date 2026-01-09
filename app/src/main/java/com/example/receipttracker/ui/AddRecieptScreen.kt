@@ -40,6 +40,7 @@ fun AddReceiptScreen(
 ) {
     val context = LocalContext.current
     var amount by remember { mutableStateOf("") }
+    val isAmountValid = amount.toDoubleOrNull() != null
     var notes by remember { mutableStateOf("") }
     var currentPhotoPath by remember { mutableStateOf<String?>(null) }
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -117,6 +118,12 @@ fun AddReceiptScreen(
                 value = amount,
                 onValueChange = { amount = it },
                 label = { Text("Amount") },
+                isError = amount.isNotEmpty() && !isAmountValid,
+                supportingText = {
+                    if (amount.isNotEmpty() && !isAmountValid) {
+                        Text("Please enter a valid number")
+                    }
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -129,7 +136,7 @@ fun AddReceiptScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 // TODO: Fix save button being enabled if user enters camera and returns without taking photo
-                enabled = currentPhotoPath != null && amount.isNotEmpty(),
+                enabled = currentPhotoPath != null && isAmountValid,
                 onClick = {
                     viewModel.addReceipt(
                         tripId = tripId,
