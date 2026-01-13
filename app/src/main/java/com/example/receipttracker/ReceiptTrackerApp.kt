@@ -29,6 +29,9 @@ data class ReceiptDetail(val receiptId: Int)
 @Composable
 fun ReceiptTrackerApp() {
     val backStack = remember { mutableStateListOf<Any>(TripList) }
+    val context = LocalContext.current
+    val application = context.applicationContext as ReceiptTrackerApplication
+    val repository = application.container.trackerRepository
     NavDisplay(
         backStack = backStack,
         // TODO: fix this onBack implementation as it is not currently used within the entry provider and code is duplicated.
@@ -36,13 +39,11 @@ fun ReceiptTrackerApp() {
         entryProvider = { key ->
             when (key) {
                 is TripList -> NavEntry(key) {
-                    val context = LocalContext.current
-                    val app = context.applicationContext as ReceiptTrackerApplication
                     // TODO: Abstract this ViewModel Factory implementation away from the NavDisplay
                     val homeViewModel: HomeViewModel = viewModel(
                         factory = object : ViewModelProvider.Factory {
                             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                                return HomeViewModel(app.container.trackerRepository) as T
+                                return HomeViewModel(application.container.trackerRepository) as T
                             }
                         }
                     )
@@ -61,11 +62,6 @@ fun ReceiptTrackerApp() {
 
                 is TripDetail -> NavEntry(key) {
                     val tripId = key.id
-                    // TODO: fix the duplication of this code here and in the AddReceipt implementation
-                    val context = LocalContext.current
-                    val application = context.applicationContext as ReceiptTrackerApplication
-                    val repository = application.container.trackerRepository
-
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
                     } else {
@@ -91,15 +87,9 @@ fun ReceiptTrackerApp() {
 
                 is AddReceipt -> NavEntry(key) {
                     val tripId = key.tripId
-                    val context = LocalContext.current
-                    val application = context.applicationContext as ReceiptTrackerApplication
-                    val repository = application.container.trackerRepository
-
-                    // Reusing Trip ViewModel
-                    val viewModelKey = "TripDetailVM_$tripId"
-
                     val viewModel: TripDetailsViewModel = viewModel(
-                        key = viewModelKey,
+                        // Reusing Trip ViewModel
+                        key = "TripDetailVM_$tripId",
                         factory = TripDetailsViewModel.provideFactory(tripId, repository)
                     )
                     AddReceiptScreen(
@@ -111,15 +101,10 @@ fun ReceiptTrackerApp() {
 
                 is ReceiptDetail -> NavEntry(key) {
                     val receiptId = key.receiptId
-                    val context = LocalContext.current
-                    val application = context.applicationContext as ReceiptTrackerApplication
-                    val repository = application.container.trackerRepository
-
                     val viewModel: ReceiptViewModel = viewModel(
                         key = "ReceiptDetailVM_$receiptId",
                         factory = ReceiptViewModel.provideFactory(receiptId, repository)
                     )
-
                     ReceiptDetailScreen(
                         viewModel = viewModel,
                         onNavigateUp = { backStack.removeLastOrNull() }
