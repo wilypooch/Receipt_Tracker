@@ -71,6 +71,7 @@ fun TripDetailScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: () -> Unit,
     onAddReceiptClick: () -> Unit,
+    onNavigateToReceipt: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -118,7 +119,7 @@ fun TripDetailScreen(
 
             ReceiptList(
                 items = uiState.receipts,
-                onReceiptClick = { TODO() },
+                onReceiptClick = onNavigateToReceipt,
                 onDeleteReceipt = { TODO() },
                 modifier = Modifier.weight(1f)
             )

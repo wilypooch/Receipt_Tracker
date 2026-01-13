@@ -13,6 +13,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.AddReceiptScreen
 import com.example.receipttracker.ui.HomeScreen
 import com.example.receipttracker.ui.HomeViewModel
+import com.example.receipttracker.ui.ReceiptDetailScreen
+import com.example.receipttracker.ui.ReceiptViewModel
 import com.example.receipttracker.ui.TripDetailScreen
 import com.example.receipttracker.ui.TripDetailsViewModel
 import java.util.UUID
@@ -20,6 +22,7 @@ import java.util.UUID
 data object TripList
 data class TripDetail(val id: Int)
 data class AddReceipt(val tripId: Int)
+data class ReceiptDetail(val receiptId: Int)
 
 
 @Suppress("UNCHECKED_CAST")
@@ -81,7 +84,8 @@ fun ReceiptTrackerApp() {
                         onNavigateUp = { backStack.removeLastOrNull() },
                         onAddReceiptClick = {
                             backStack.add(AddReceipt(tripId))
-                        }
+                        },
+                        onNavigateToReceipt = { receiptId -> backStack.add(ReceiptDetail(receiptId)) }
                     )
                 }
 
@@ -102,6 +106,23 @@ fun ReceiptTrackerApp() {
                         tripId = tripId,
                         viewModel = viewModel,
                         onReceiptSaved = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                is ReceiptDetail -> NavEntry(key) {
+                    val receiptId = key.receiptId
+                    val context = LocalContext.current
+                    val application = context.applicationContext as ReceiptTrackerApplication
+                    val repository = application.container.trackerRepository
+
+                    val viewModel: ReceiptViewModel = viewModel(
+                        key = "ReceiptDetailVM_$receiptId",
+                        factory = ReceiptViewModel.provideFactory(receiptId, repository)
+                    )
+
+                    ReceiptDetailScreen(
+                        viewModel = viewModel,
+                        onNavigateUp = { backStack.removeLastOrNull() }
                     )
                 }
 

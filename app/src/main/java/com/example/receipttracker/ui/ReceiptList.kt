@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,8 +22,8 @@ import com.example.receipttracker.data.Receipt
 @Composable
 fun ReceiptList(
     items: List<Receipt>,
-    // TODO: Manage onClick and onDelete
     onReceiptClick: (Int) -> Unit,
+    // TODO: Manage onDelete
     // TODO: Need to delete receipt photo from device as well as from database
     onDeleteReceipt: (Receipt) -> Unit,
     modifier: Modifier = Modifier,
@@ -32,14 +33,14 @@ fun ReceiptList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(items) { item ->
+        items(items) { receipt ->
             // TODO: Add swipe to delete functionality
             ReceiptListCard(
-                receiptUri = item.imageUri,
-                receiptDate = item.date,
-                receiptAmount = item.amount,
-                receiptNotes = item.notes,
-                onClick = { TODO() }
+                receiptUri = receipt.imageUri,
+                receiptDate = receipt.date,
+                receiptAmount = receipt.amount,
+                receiptNotes = receipt.notes,
+                onClick = { onReceiptClick(receipt.receiptId) }
             )
         }
     }
@@ -58,8 +59,10 @@ fun ReceiptListCard(
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        onClick = onClick
+            .padding(horizontal = 8.dp)
+            .clickable(
+                onClick = onClick
+            )
     ) {
         Row(modifier = modifier.padding(16.dp)) {
             Column {
