@@ -1,6 +1,7 @@
 package com.example.receipttracker.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.data.TrackerRepository
@@ -57,5 +58,18 @@ class ReceiptViewModel(
         viewModelScope.launch {
             repository.deleteReceiptById(receiptId)
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    companion object {
+        fun provideFactory(
+            receiptId: Int,
+            repository: TrackerRepository,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ReceiptViewModel(receiptId, repository) as T
+                }
+            }
     }
 }
