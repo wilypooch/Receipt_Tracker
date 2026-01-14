@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.data.Receipt
+import com.example.receipttracker.ui.utils.DeleteAlertDialog
+import com.example.receipttracker.ui.utils.ItemToBeDeleted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +93,7 @@ fun ReceiptDetailContent(
     modifier: Modifier,
 ) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -133,11 +136,18 @@ fun ReceiptDetailContent(
         }
 
         Button(
-            onClick = onDeleteClick
+            onClick = { showDeleteDialog = true }
             // TODO: Disable unless trip already in database
-            // TODO: Add Confirmation dialog for this deletion too
         ) {
             Text("Delete")
+        }
+
+        if (showDeleteDialog) {
+            DeleteAlertDialog(
+                item = ItemToBeDeleted.Receipt,
+                onDismiss = { showDeleteDialog = false },
+                onConfirmDelete = onDeleteClick
+            )
         }
     }
 }
