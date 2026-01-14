@@ -45,6 +45,7 @@ import com.example.receipttracker.R
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
+import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import java.util.Date
 import java.util.Locale
 
@@ -71,7 +72,7 @@ fun TripDetailScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: () -> Unit,
     onAddReceiptClick: () -> Unit,
-    onNavigateToReceipt: (Int) -> Unit
+    onNavigateToReceipt: (Int) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -219,6 +220,7 @@ fun TripDetailContent(
         }
         if (showDeleteDialog) {
             DeleteAlertDialog(
+                item = ItemToBeDeleted.Trip,
                 onDismiss = { showDeleteDialog = false },
                 onConfirmDelete = onDeleteClick
             )
