@@ -130,6 +130,7 @@ fun ReceiptDetailContent(
 
         Button(
             // TODO: Disable until fields are full
+            // TODO: Also disable unless changes have been made
             onClick = onUpdateClick,
         ) {
             Text("Save")
