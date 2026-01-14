@@ -29,9 +29,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
+enum class ItemToBeDeleted {
+    Trip,
+    Receipt;
+
+    fun toLowerCaseString(): String {
+        return this.name.lowercase()
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteAlertDialog(
+    item: ItemToBeDeleted,
     onConfirmDelete: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -52,7 +63,7 @@ fun DeleteAlertDialog(
                 Icon(Icons.Filled.Warning, contentDescription = "Warning")
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Do you really want to delete this trip? This action cannot be undone.",
+                    text = "Do you really want to delete this ${item.toLowerCaseString()}? This action cannot be undone.",
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -84,6 +95,6 @@ fun DeleteAlertDialog(
 @Composable
 fun DialogPreview() {
     ReceiptTrackerTheme {
-        DeleteAlertDialog(onConfirmDelete = {}, onDismiss = {})
+        DeleteAlertDialog(item = ItemToBeDeleted.Trip, onConfirmDelete = {}, onDismiss = {})
     }
 }

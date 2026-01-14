@@ -7,11 +7,12 @@ interface TrackerRepository {
     fun getAllTripsByDateAscStream(): Flow<List<Trip>>
     suspend fun insertTrip(trip: Trip)
     suspend fun updateTrip(trip: Trip)
-    suspend fun deleteTrip(trip: Trip)
+    suspend fun deleteTripById(id: Int)
 
     fun getReceiptStream(id: Int): Flow<Receipt?>
     fun getAllReceiptsForTripStream(id: Int): Flow<List<Receipt>>
     suspend fun insertReceipt(receipt: Receipt)
     suspend fun updateReceipt(receipt: Receipt)
-    suspend fun deleteReceipt(receipt: Receipt)
+    suspend fun deleteReceiptById(id: Int)
+    suspend fun getReceiptsForTripForDeletion(id: Int): List<Receipt>
 }

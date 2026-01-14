@@ -45,6 +45,7 @@ import com.example.receipttracker.R
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
+import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import java.util.Date
 import java.util.Locale
 
@@ -71,6 +72,7 @@ fun TripDetailScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: () -> Unit,
     onAddReceiptClick: () -> Unit,
+    onNavigateToReceipt: (Int) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -118,8 +120,7 @@ fun TripDetailScreen(
 
             ReceiptList(
                 items = uiState.receipts,
-                onReceiptClick = { TODO() },
-                onDeleteReceipt = { TODO() },
+                onReceiptClick = onNavigateToReceipt,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -151,14 +152,6 @@ fun TripDetailContent(
     var showDatePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-
-    var amountText by remember { mutableStateOf("") }
-    LaunchedEffect(uiState.trip.totalAmount) {
-        val vmAmount = uiState.trip.totalAmount
-        if (vmAmount.toString() != amountText) {
-            amountText = if (vmAmount == 0.0) "" else vmAmount.toString()
-        }
-    }
 
     Column(
         modifier = modifier
@@ -214,6 +207,7 @@ fun TripDetailContent(
 
         Button(
             // TODO: Disable until fields are full
+            // TODO: Also disable unless changes have been made
             onClick = onSaveClick,
         ) {
             Text("Save")
@@ -226,6 +220,7 @@ fun TripDetailContent(
         }
         if (showDeleteDialog) {
             DeleteAlertDialog(
+                item = ItemToBeDeleted.Trip,
                 onDismiss = { showDeleteDialog = false },
                 onConfirmDelete = onDeleteClick
             )

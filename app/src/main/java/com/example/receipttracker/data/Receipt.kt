@@ -22,13 +22,13 @@ data class Receipt(
     @ColumnInfo(name = "receipt_id")
     val receiptId: Int = 0,
     @ColumnInfo(name = "trip_id")
-    val tripId: Int,
+    val tripId: Int = 0,
     @ColumnInfo(name = "date")
-    val date: String,
+    val date: String = "",
     @ColumnInfo(name = "image_uri")
-    val imageUri: String,
+    val imageUri: String = "",
     @ColumnInfo(name = "amount")
-    val amount: Double,
+    val amount: Double = 0.0,
     @ColumnInfo(name = "notes")
-    val notes: String,
+    val notes: String = "",
 )
