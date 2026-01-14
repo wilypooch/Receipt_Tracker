@@ -3,6 +3,7 @@ package com.example.receipttracker.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
@@ -100,7 +102,12 @@ fun ReceiptDetailContent(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // TODO: Add Async Image of Receipt Here
+        AsyncImage(
+            model = receipt.imageUri,
+            contentDescription = "Receipt Image",
+            modifier = Modifier
+                .height(400.dp)
+        )
 
         OutlinedTextField(
             // TODO: Add Date Picker Functionality
