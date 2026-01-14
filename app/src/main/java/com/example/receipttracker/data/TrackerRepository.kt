@@ -14,4 +14,5 @@ interface TrackerRepository {
     suspend fun insertReceipt(receipt: Receipt)
     suspend fun updateReceipt(receipt: Receipt)
     suspend fun deleteReceiptById(id: Int)
+    suspend fun getReceiptsForTripForDeletion(id: Int): List<Receipt>
 }

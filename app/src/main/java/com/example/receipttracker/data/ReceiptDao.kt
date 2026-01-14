@@ -23,4 +23,8 @@ interface ReceiptDao {
 
     @Query("SELECT * FROM receipt WHERE trip_id = :id ORDER BY receipt_id")
     fun getAllReceiptsForTrip(id: Int): Flow<List<Receipt>>
+
+    // Non-flow version for file clean up when Trip is deleted
+    @Query("SELECT * FROM receipt WHERE trip_id = :id")
+    suspend fun getReceiptsForTripForDeletion(id: Int): List<Receipt>
 }

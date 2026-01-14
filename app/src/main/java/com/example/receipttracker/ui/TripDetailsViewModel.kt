@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -93,9 +94,18 @@ class TripDetailsViewModel(
     }
 
     fun deleteTrip() {
-        if (isNewTrip) return
+        if (tripId <= 0) return
         viewModelScope.launch {
-            repository.deleteTrip(Trip(tripId = tripId))
+            val allReceipts = repository.getReceiptsForTripForDeletion(tripId)
+            allReceipts.forEach { receipt ->
+                try {
+                    val file = java.io.File(receipt.imageUri)
+                    if (file.exists()) file.delete()
+                } catch (e: Exception) {
+                    Log.e("TripVM", "File deletion failed", e)
+                }
+            }
+            repository.deleteTripById(tripId)
         }
     }
 
