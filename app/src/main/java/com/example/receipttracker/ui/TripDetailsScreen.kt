@@ -181,7 +181,33 @@ fun TripDetailContent(
                 }
             }
         )
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val startMillis = datePickerState.selectedStartDateMillis
+                            val endMillis = datePickerState.selectedEndDateMillis
 
+                            if (startMillis != null) {
+                                onStartDateChange(convertMillisToDate(startMillis))
+                            }
+                            if (endMillis != null) {
+                                onEndDateChange(convertMillisToDate(endMillis))
+                            }
+                            showDatePicker = false
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                }, dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) { TripDateRangePicker(state = datePickerState) }
+        }
         Button(
             // TODO: Disable until fields are full
             // TODO: Also disable unless changes have been made
@@ -202,33 +228,6 @@ fun TripDetailContent(
                 onConfirmDelete = onDeleteClick
             )
         }
-    }
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val startMillis = datePickerState.selectedStartDateMillis
-                        val endMillis = datePickerState.selectedEndDateMillis
-
-                        if (startMillis != null) {
-                            onStartDateChange(convertMillisToDate(startMillis))
-                        }
-                        if (endMillis != null) {
-                            onEndDateChange(convertMillisToDate(endMillis))
-                        }
-                        showDatePicker = false
-                    }
-                ) {
-                    Text("OK")
-                }
-            }, dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) { TripDateRangePicker(state = datePickerState) }
     }
 }
 
