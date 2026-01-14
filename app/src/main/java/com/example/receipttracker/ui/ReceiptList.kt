@@ -23,8 +23,6 @@ import com.example.receipttracker.data.Receipt
 fun ReceiptList(
     items: List<Receipt>,
     onReceiptClick: (Int) -> Unit,
-    // TODO: Manage onDelete
-    onDeleteReceipt: (Receipt) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -33,7 +31,7 @@ fun ReceiptList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { receipt ->
-            // TODO: Add swipe to delete functionality
+            // TODO: Add swipe to delete functionality ?
             ReceiptListCard(
                 receiptUri = receipt.imageUri,
                 receiptDate = receipt.date,

@@ -121,7 +121,6 @@ fun TripDetailScreen(
             ReceiptList(
                 items = uiState.receipts,
                 onReceiptClick = onNavigateToReceipt,
-                onDeleteReceipt = { TODO() },
                 modifier = Modifier.weight(1f)
             )
         }
