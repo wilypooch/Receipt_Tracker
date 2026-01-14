@@ -24,7 +24,6 @@ fun ReceiptList(
     items: List<Receipt>,
     onReceiptClick: (Int) -> Unit,
     // TODO: Manage onDelete
-    // TODO: Need to delete receipt photo from device as well as from database
     onDeleteReceipt: (Receipt) -> Unit,
     modifier: Modifier = Modifier,
 ) {

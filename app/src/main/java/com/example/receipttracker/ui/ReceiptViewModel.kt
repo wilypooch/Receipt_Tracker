@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -56,6 +57,17 @@ class ReceiptViewModel(
 
     fun deleteReceipt() {
         viewModelScope.launch {
+            val receiptToDelete = receiptState.value
+            if (receiptToDelete != null) {
+                try {
+                    val file = java.io.File(receiptToDelete.imageUri)
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ReceiptVM", "Failed to delete image file", e)
+                }
+            }
             repository.deleteReceiptById(receiptId)
         }
     }
