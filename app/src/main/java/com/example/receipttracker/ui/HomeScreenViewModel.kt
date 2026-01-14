@@ -29,7 +29,7 @@ class HomeViewModel(
 
     fun deleteTrip(trip: Trip) {
         viewModelScope.launch {
-            repository.deleteTrip(trip)
+            repository.deleteTripById(trip.tripId)
         }
     }
 }
