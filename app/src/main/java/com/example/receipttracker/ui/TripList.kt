@@ -20,17 +20,10 @@ import androidx.compose.ui.unit.dp
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
-private val tripsForPreview = listOf(
-    Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", 400.00),
-    Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993", 20.00),
-    Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", 4888.86)
-)
-
 @Composable
 fun TripList(
     items: List<Trip>,
     onTripClick: (Int) -> Unit,
-    onDeleteTrip: (Trip) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -39,7 +32,7 @@ fun TripList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            // TODO: Add swipe to delete functionality
+            // TODO: Add swipe to delete functionality ?
             TripListCard(
                 tripName = item.name,
                 tripStartDate = item.startDate,
@@ -95,7 +88,11 @@ fun TripListCard(
 fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
-            items = tripsForPreview, onTripClick = {}, onDeleteTrip = {}
+            items = listOf(
+                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", 400.00),
+                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993", 20.00),
+                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", 4888.86)
+            ), onTripClick = {}
         )
     }
 }

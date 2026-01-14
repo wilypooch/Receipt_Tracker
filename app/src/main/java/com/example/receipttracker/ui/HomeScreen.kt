@@ -57,7 +57,6 @@ fun HomeScreen(
             TripList(
                 items = uiState.trips,
                 onTripClick = onViewTripClick,
-                onDeleteTrip = viewModel::deleteTrip,
                 modifier = Modifier.padding(innerPadding),
             )
         }
