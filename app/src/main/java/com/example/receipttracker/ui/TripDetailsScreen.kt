@@ -1,12 +1,7 @@
 package com.example.receipttracker.ui
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.TimeZone
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,8 +11,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -46,25 +39,9 @@ import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
-import java.util.Date
-import java.util.Locale
-
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-    formatter.timeZone = TimeZone.getTimeZone("UTC")
-    return formatter.format(Date(millis))
-}
-
-fun convertDateStringToMillis(dateString: String): Long? {
-    if (dateString.isBlank()) return null
-    val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-    formatter.timeZone = TimeZone.getTimeZone("UTC")
-    return try {
-        formatter.parse(dateString)?.time
-    } catch (_: Exception) {
-        null
-    }
-}
+import com.example.receipttracker.ui.utils.TripDateRangePicker
+import com.example.receipttracker.ui.utils.convertDateStringToMillis
+import com.example.receipttracker.ui.utils.convertMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,31 +230,6 @@ fun TripDetailContent(
             }
         ) { TripDateRangePicker(state = datePickerState) }
     }
-}
-
-@Composable
-fun TripDateRangePicker(state: DateRangePickerState) {
-    DateRangePicker(
-        state = state,
-        title = {
-            Text(
-                text = "Select trip dates", modifier = Modifier.padding(16.dp)
-            )
-        }, headline = {
-            Row(modifier = Modifier.padding(16.dp)) {
-                Box(Modifier.weight(1f)) {
-                    (state.selectedStartDateMillis?.let { convertMillisToDate(it) }
-                        ?: "Start Date").let { Text(it) }
-                }
-                Box(Modifier.weight(1f)) {
-                    (state.selectedEndDateMillis?.let { convertMillisToDate(it) }
-                        ?: "End Date").let { Text(it) }
-                }
-            }
-        },
-        showModeToggle = true,
-        modifier = Modifier.height(height = 500.dp)
-    )
 }
 
 @Preview(showBackground = true, name = "Existing Trip")
