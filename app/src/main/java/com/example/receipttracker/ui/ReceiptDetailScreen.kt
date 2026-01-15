@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -39,11 +40,15 @@ import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
+import java.util.Calendar
+import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReceiptDetailScreen(
     viewModel: ReceiptViewModel,
+    tripStartDate: String,
+    tripEndDate: String,
     onNavigateUp: () -> Unit,
 ) {
     Scaffold(
@@ -74,6 +79,8 @@ fun ReceiptDetailScreen(
             ) {
                 ReceiptDetailContent(
                     receipt = edits!!,
+                    tripStartDate = tripStartDate,
+                    tripEndDate = tripEndDate,
                     onDateChange = viewModel::onDateChange,
                     onAmountChange = viewModel::onAmountChange,
                     onNotesChange = viewModel::onNotesChange,
@@ -95,6 +102,8 @@ fun ReceiptDetailScreen(
 @Composable
 fun ReceiptDetailContent(
     receipt: Receipt,
+    tripStartDate: String,
+    tripEndDate: String,
     onDateChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
@@ -103,12 +112,27 @@ fun ReceiptDetailContent(
     modifier: Modifier,
 ) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    val tripStartMillis = convertDateStringToMillis(tripStartDate) ?: Long.MIN_VALUE
+    val tripEndMillis = convertDateStringToMillis(tripEndDate) ?: Long.MAX_VALUE
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateStringToMillis(receipt.date)
-        // TODO: Restrict selectable dates to start and end dates of trip
+        initialSelectedDateMillis = convertDateStringToMillis(receipt.date),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis in tripStartMillis..tripEndMillis
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.timeInMillis = tripStartMillis
+                val startYear = calendar.get(Calendar.YEAR)
+                calendar.timeInMillis = tripEndMillis
+                val endYear = calendar.get(Calendar.YEAR)
+                return year in startYear..endYear
+            }
+        }
     )
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
