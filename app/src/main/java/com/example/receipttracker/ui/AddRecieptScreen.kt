@@ -135,8 +135,7 @@ fun AddReceiptScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                // TODO: Fix save button being enabled if user enters camera and returns without taking photo
-                enabled = currentPhotoPath != null && isAmountValid,
+                enabled = capturedImageUri != null && selectedDate != "" && isAmountValid,
                 onClick = {
                     viewModel.addReceipt(
                         tripId = tripId,
