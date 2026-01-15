@@ -108,6 +108,10 @@ class TripDetailsViewModel(
                 notes = notes
             )
             repository.insertReceipt(receipt)
+
+            val currentTrip = uiState.value.trip
+            val newTotal = uiState.value.receipts.sumOf { it.amount } + amount
+            repository.updateTrip(currentTrip.copy(totalAmount = newTotal))
         }
     }
 
