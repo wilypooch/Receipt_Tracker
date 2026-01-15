@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 data class TripDetailsUiState(
     val trip: Trip = Trip(),
@@ -109,12 +108,11 @@ class TripDetailsViewModel(
         }
     }
 
-    fun addReceipt(tripId: Int, imagePath: String, amount: Double, notes: String) {
+    fun addReceipt(tripId: Int, date: String, imagePath: String, amount: Double, notes: String) {
         viewModelScope.launch {
             val receipt = Receipt(
                 tripId = tripId,
-                date = LocalDate.now()
-                    .toString(), // TODO: May need to be reformatted, looks to simplistic but seems to work
+                date = date,
                 imageUri = imagePath,
                 amount = amount,
                 notes = notes

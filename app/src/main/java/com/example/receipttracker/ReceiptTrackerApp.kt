@@ -22,7 +22,7 @@ import java.util.UUID
 data object TripList
 data class TripDetail(val id: Int)
 data class AddReceipt(val tripId: Int)
-data class ReceiptDetail(val receiptId: Int)
+data class ReceiptDetail(val receiptId: Int, val tripStartDate: String, val tripEndDate: String)
 
 
 @Suppress("UNCHECKED_CAST")
@@ -75,13 +75,15 @@ fun ReceiptTrackerApp() {
                                 repository
                             )
                         )
+                    val start = viewModel.uiState.value.trip.startDate
+                    val endDate = viewModel.uiState.value.trip.endDate
                     TripDetailScreen(
                         viewModel = viewModel,
                         onNavigateUp = { backStack.removeLastOrNull() },
                         onAddReceiptClick = {
                             backStack.add(AddReceipt(tripId))
                         },
-                        onNavigateToReceipt = { receiptId -> backStack.add(ReceiptDetail(receiptId)) }
+                        onNavigateToReceipt = { receiptId -> backStack.add(ReceiptDetail(receiptId, start, endDate)) }
                     )
                 }
 
@@ -101,12 +103,16 @@ fun ReceiptTrackerApp() {
 
                 is ReceiptDetail -> NavEntry(key) {
                     val receiptId = key.receiptId
+                    val tripStartDate = key.tripStartDate
+                    val tripEndDate = key.tripEndDate
                     val viewModel: ReceiptViewModel = viewModel(
                         key = "ReceiptDetailVM_$receiptId",
                         factory = ReceiptViewModel.provideFactory(receiptId, repository)
                     )
                     ReceiptDetailScreen(
                         viewModel = viewModel,
+                        tripStartDate = tripStartDate,
+                        tripEndDate = tripEndDate,
                         onNavigateUp = { backStack.removeLastOrNull() }
                     )
                 }
