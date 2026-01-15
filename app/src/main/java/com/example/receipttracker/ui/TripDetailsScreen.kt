@@ -9,8 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -67,9 +65,20 @@ fun TripDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    val uiState by viewModel.uiState.collectAsState()
+                    val isTripValid = uiState.trip.name.isNotBlank() &&
+                            uiState.trip.startDate.isNotBlank() &&
+                            uiState.trip.endDate.isNotBlank()
+                    IconButton(
+                        onClick = {
+                            viewModel.saveTrip()
+                            onNavigateUp()
+                        },
+                        // TODO: Also disable unless changes have been made
+                        enabled = isTripValid
+                    ) {
                         Icon(
-                            imageVector = Icons.Filled.Done,
+                            painterResource(R.drawable.ic_save),
                             contentDescription = "Save"
                         )
                     }
@@ -113,10 +122,6 @@ fun TripDetailScreen(
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
-                onSaveClick = {
-                    viewModel.saveTrip()
-                    onNavigateUp()
-                },
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
@@ -135,8 +140,6 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
-    onSaveClick: () -> Unit,
-
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
@@ -152,7 +155,6 @@ fun TripDetailContent(
         }
     }
     var showDatePicker by remember { mutableStateOf(false) }
-
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -233,13 +235,6 @@ fun TripDetailContent(
                 }
             ) { TripDateRangePicker(state = datePickerState) }
         }
-        Button(
-            // TODO: Disable until fields are full
-            // TODO: Also disable unless changes have been made
-            onClick = onSaveClick,
-        ) {
-            Text("Save")
-        }
     }
 }
 
@@ -261,7 +256,6 @@ fun TripDetailsContentPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onSaveClick = {},
             modifier = Modifier,
         )
     }
@@ -276,7 +270,6 @@ fun TripDetailNewPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onSaveClick = {},
             modifier = Modifier,
         )
     }
