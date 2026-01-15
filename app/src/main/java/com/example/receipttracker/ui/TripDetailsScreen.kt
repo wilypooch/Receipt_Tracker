@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -51,13 +52,24 @@ fun TripDetailScreen(
     onAddReceiptClick: () -> Unit,
     onNavigateToReceipt: (Int) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val handleBackNavigation = {
+        if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
+            viewModel.deleteTrip()
+        }
+        onNavigateUp()
+    }
+    BackHandler(onBack = handleBackNavigation)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Trip Details") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+                    IconButton(onClick = {
+                        handleBackNavigation()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -65,7 +77,6 @@ fun TripDetailScreen(
                     }
                 },
                 actions = {
-                    val uiState by viewModel.uiState.collectAsState()
                     val isTripValid = uiState.trip.name.isNotBlank() &&
                             uiState.trip.startDate.isNotBlank() &&
                             uiState.trip.endDate.isNotBlank()
