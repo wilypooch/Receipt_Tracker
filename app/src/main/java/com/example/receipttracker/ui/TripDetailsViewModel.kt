@@ -79,7 +79,7 @@ class TripDetailsViewModel(
     fun saveTrip() {
         viewModelScope.launch {
             val currentTrip = uiState.value.trip
-            repository.updateTrip(currentTrip.copy(tripId = _currentTripId.value))
+            repository.updateTrip(currentTrip)
         }
     }
 
