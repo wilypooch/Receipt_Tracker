@@ -94,11 +94,10 @@ fun TripDetailScreen(
                         DeleteAlertDialog(
                             item = ItemToBeDeleted.Trip,
                             onDismiss = { showDeleteDialog = false },
-                            onConfirmDelete =
-                                {
-                                    viewModel.deleteTrip()
-                                    onNavigateUp()
-                                }
+                            onConfirmDelete = {
+                                viewModel.deleteTrip()
+                                onNavigateUp()
+                            }
                         )
                     }
                 }
