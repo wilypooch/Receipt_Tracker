@@ -82,12 +82,13 @@ fun TripDetailScreen(
                             contentDescription = "Save"
                         )
                     }
-                    // TODO: Hide unless trip already in database
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
+                    if (uiState.trip.tripId > 0) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
                     }
                     if (showDeleteDialog) {
                         DeleteAlertDialog(
