@@ -7,12 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.data.TrackerRepository
 import com.example.receipttracker.data.Trip
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,15 +24,19 @@ data class TripDetailsUiState(
     val receipts: List<Receipt> = emptyList(),
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TripDetailsViewModel(
-    private val tripId: Int,
+    initialTripId: Int,
     private val repository: TrackerRepository,
 ) :
     ViewModel() {
 
-    private val isNewTrip = tripId == -1
+    private val _currentTripId = MutableStateFlow(initialTripId)
     private val _userEdits = MutableStateFlow(Trip())
-    val uiState: StateFlow<TripDetailsUiState> = createUiStateStream()
+    val uiState: StateFlow<TripDetailsUiState> =
+        _currentTripId.filter { it != -1 }.flatMapLatest { id ->
+            val tripFromDbStream = repository.getTripStream(id).filterNotNull()
+            val receiptsFromDbStream = repository.getAllReceiptsForTripStream(id)
 
     private fun createUiStateStream(): StateFlow<TripDetailsUiState> {
         return if (isNewTrip) {
@@ -47,6 +53,7 @@ class TripDetailsViewModel(
                 receiptsFromDbStream,
                 _userEdits
             ) { tripFromDb, receipts, edits ->
+            combine(tripFromDbStream, receiptsFromDbStream, _userEdits) { tripDb, receipts, edits ->
                 TripDetailsUiState(
                     trip = tripFromDb.copy(
                         name = edits.name.takeIf { it.isNotBlank() } ?: tripFromDb.name,
@@ -55,12 +62,25 @@ class TripDetailsViewModel(
                         endDate = edits.endDate.takeIf { it.isNotBlank() } ?: tripFromDb.endDate,
                     ),
                     receipts = receipts
+                    trip = tripDb.copy(
+                        name = edits.name.ifBlank { tripDb.name },
+                        startDate = edits.startDate.ifBlank { tripDb.startDate },
+                        endDate = edits.endDate.ifBlank { tripDb.endDate },
+                    ), receipts = receipts
                 )
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = TripDetailsUiState()
-            )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = TripDetailsUiState()
+        )
+
+    init {
+        if (initialTripId == -1) {
+            viewModelScope.launch {
+                val newId: Long = repository.insertTrip(Trip())
+                _currentTripId.value = newId.toInt()
+            }
         }
     }
 
@@ -83,19 +103,14 @@ class TripDetailsViewModel(
 
     fun saveTrip() {
         viewModelScope.launch {
-            val editedTrip = _userEdits.value
-            if (isNewTrip) {
-                repository.insertTrip(editedTrip)
-            } else {
-                repository.updateTrip(editedTrip.copy(tripId = this@TripDetailsViewModel.tripId))
-            }
+            val currentTrip = uiState.value.trip
+            repository.updateTrip(currentTrip.copy(tripId = _currentTripId.value))
         }
     }
 
     fun deleteTrip() {
-        if (tripId <= 0) return
         viewModelScope.launch {
-            val allReceipts = repository.getReceiptsForTripForDeletion(tripId)
+            val allReceipts = repository.getReceiptsForTripForDeletion(_currentTripId.value)
             allReceipts.forEach { receipt ->
                 try {
                     val file = java.io.File(receipt.imageUri)
@@ -104,14 +119,14 @@ class TripDetailsViewModel(
                     Log.e("TripVM", "File deletion failed", e)
                 }
             }
-            repository.deleteTripById(tripId)
+            repository.deleteTripById(_currentTripId.value)
         }
     }
 
-    fun addReceipt(tripId: Int, date: String, imagePath: String, amount: Double, notes: String) {
+    fun addReceipt(date: String, imagePath: String, amount: Double, notes: String) {
         viewModelScope.launch {
             val receipt = Receipt(
-                tripId = tripId,
+                tripId = _currentTripId.value,
                 date = date,
                 imageUri = imagePath,
                 amount = amount,

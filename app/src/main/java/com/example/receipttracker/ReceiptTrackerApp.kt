@@ -95,7 +95,6 @@ fun ReceiptTrackerApp() {
                         factory = TripDetailsViewModel.provideFactory(tripId, repository)
                     )
                     AddReceiptScreen(
-                        tripId = tripId,
                         viewModel = viewModel,
                         onReceiptSaved = { backStack.removeLastOrNull() }
                     )

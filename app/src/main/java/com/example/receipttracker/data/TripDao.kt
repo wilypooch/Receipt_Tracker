@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TripDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(trip: Trip)
+    suspend fun insert(trip: Trip): Long
 
     @Update
     suspend fun update(trip: Trip)

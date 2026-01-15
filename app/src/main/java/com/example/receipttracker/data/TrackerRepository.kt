@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 interface TrackerRepository {
     fun getTripStream(id: Int): Flow<Trip?>
     fun getAllTripsByDateAscStream(): Flow<List<Trip>>
-    suspend fun insertTrip(trip: Trip)
+    suspend fun insertTrip(trip: Trip): Long
     suspend fun updateTrip(trip: Trip)
     suspend fun deleteTripById(id: Int)
 
