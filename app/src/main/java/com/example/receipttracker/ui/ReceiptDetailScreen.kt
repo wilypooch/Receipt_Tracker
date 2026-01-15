@@ -66,37 +66,38 @@ fun ReceiptDetailScreen(
                     }
                 },
                 actions = {
-                    val isReceiptValid = uiState?.let { receipt ->
-                        receipt.date.isNotBlank() &&
-                                receipt.amount > 0.0 &&
-                                receipt.imageUri.isNotBlank()
-                    } ?: false
+                    val currentReceipt = uiState
+                    if (currentReceipt != null) {
+                        val isReceiptValid = currentReceipt.date.isNotBlank() &&
+                                currentReceipt.amount > 0.0 &&
+                                currentReceipt.imageUri.isNotBlank()
 
-                    IconButton(onClick = {
-                        viewModel.updateReceipt()
-                        onNavigateUp()
-                        // TODO: Also disable unless changes have been made
-                    }, enabled = isReceiptValid) {
-                        Icon(
-                            painterResource(R.drawable.ic_save),
-                            contentDescription = "Save"
-                        )
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                    if (showDeleteDialog) {
-                        DeleteAlertDialog(
-                            item = ItemToBeDeleted.Receipt,
-                            onDismiss = { showDeleteDialog = false },
-                            onConfirmDelete = {
-                                viewModel.deleteReceipt()
-                                onNavigateUp()
-                            }
-                        )
+                        IconButton(onClick = {
+                            viewModel.updateReceipt()
+                            onNavigateUp()
+                            // TODO: Also disable unless changes have been made
+                        }, enabled = isReceiptValid) {
+                            Icon(
+                                painterResource(R.drawable.ic_save),
+                                contentDescription = "Save"
+                            )
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                        if (showDeleteDialog) {
+                            DeleteAlertDialog(
+                                item = ItemToBeDeleted.Receipt,
+                                onDismiss = { showDeleteDialog = false },
+                                onConfirmDelete = {
+                                    viewModel.deleteReceipt(currentReceipt.tripId)
+                                    onNavigateUp()
+                                }
+                            )
+                        }
                     }
                 }
             )

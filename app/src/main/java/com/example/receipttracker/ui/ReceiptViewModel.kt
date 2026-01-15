@@ -55,9 +55,10 @@ class ReceiptViewModel(
         }
     }
 
-    fun deleteReceipt() {
+    fun deleteReceipt(tripId: Int) {
         viewModelScope.launch {
             val receiptToDelete = receiptState.value
+            val amountToRemove = receiptToDelete?.amount ?: 0.0
             if (receiptToDelete != null) {
                 try {
                     val file = java.io.File(receiptToDelete.imageUri)
@@ -67,6 +68,12 @@ class ReceiptViewModel(
                 } catch (e: Exception) {
                     Log.e("ReceiptVM", "Failed to delete image file", e)
                 }
+            }
+            val actualTrip = repository.getTripById(tripId)
+            if (actualTrip != null) {
+                val newTotal =
+                    (actualTrip.totalAmount - amountToRemove).coerceAtLeast(0.0)
+                repository.updateTrip(actualTrip.copy(totalAmount = newTotal))
             }
             repository.deleteReceiptById(receiptId)
         }
