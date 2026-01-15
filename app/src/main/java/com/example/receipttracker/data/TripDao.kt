@@ -18,9 +18,13 @@ interface TripDao {
     @Query("DELETE FROM trip WHERE trip_id = :id")
     suspend fun deleteById(id: Int)
 
-    @Query("SELECT * from trip WHERE trip_id = :id")
+    @Query("SELECT * FROM trip WHERE trip_id = :id")
     fun getTrip(id: Int): Flow<Trip?>
 
-    @Query("SELECT * from trip ORDER BY start_date ASC")
+    // Non-flow version that is used when deleting receipts
+    @Query("SELECT * FROM trip WHERE trip_Id = :id")
+    fun getTripById(id: Int): Trip?
+
+    @Query("SELECT * FROM trip WHERE name != '' ORDER BY start_date ASC")
     fun getAllTripsByDateAsc(): Flow<List<Trip>>
 }
