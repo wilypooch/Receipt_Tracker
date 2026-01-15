@@ -38,34 +38,14 @@ class TripDetailsViewModel(
             val tripFromDbStream = repository.getTripStream(id).filterNotNull()
             val receiptsFromDbStream = repository.getAllReceiptsForTripStream(id)
 
-    private fun createUiStateStream(): StateFlow<TripDetailsUiState> {
-        return if (isNewTrip) {
-            _userEdits.map { editedTrip -> TripDetailsUiState(trip = editedTrip) }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = TripDetailsUiState()
-            )
-        } else {
-            val tripFromDbStream = repository.getTripStream(tripId).filterNotNull()
-            val receiptsFromDbStream = repository.getAllReceiptsForTripStream(tripId)
-            combine(
-                tripFromDbStream,
-                receiptsFromDbStream,
-                _userEdits
-            ) { tripFromDb, receipts, edits ->
             combine(tripFromDbStream, receiptsFromDbStream, _userEdits) { tripDb, receipts, edits ->
+                val calculatedTotal = receipts.sumOf { it.amount }
                 TripDetailsUiState(
-                    trip = tripFromDb.copy(
-                        name = edits.name.takeIf { it.isNotBlank() } ?: tripFromDb.name,
-                        startDate = edits.startDate.takeIf { it.isNotBlank() }
-                            ?: tripFromDb.startDate,
-                        endDate = edits.endDate.takeIf { it.isNotBlank() } ?: tripFromDb.endDate,
-                    ),
-                    receipts = receipts
                     trip = tripDb.copy(
                         name = edits.name.ifBlank { tripDb.name },
                         startDate = edits.startDate.ifBlank { tripDb.startDate },
                         endDate = edits.endDate.ifBlank { tripDb.endDate },
+                        totalAmount = calculatedTotal
                     ), receipts = receipts
                 )
             }
@@ -94,11 +74,6 @@ class TripDetailsViewModel(
 
     fun onEndDateChange(value: String) {
         _userEdits.update { it.copy(endDate = value) }
-    }
-
-    // TODO: Looks like this will need amending / removing as user no longer manually edits total trip amount
-    fun onTotalAmountChange(value: Double) {
-        _userEdits.update { it.copy(totalAmount = value) }
     }
 
     fun saveTrip() {
