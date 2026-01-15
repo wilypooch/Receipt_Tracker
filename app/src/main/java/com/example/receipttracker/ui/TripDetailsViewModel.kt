@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 data class TripDetailsUiState(
     val trip: Trip = Trip(),
@@ -110,11 +112,11 @@ class TripDetailsViewModel(
     }
 
     fun addReceipt(tripId: Int, imagePath: String, amount: Double, notes: String) {
+        val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
         viewModelScope.launch {
             val receipt = Receipt(
                 tripId = tripId,
-                date = LocalDate.now()
-                    .toString(), // TODO: May need to be reformatted, looks to simplistic but seems to work
+                date = LocalDate.now().format(formatter),
                 imageUri = imagePath,
                 amount = amount,
                 notes = notes
