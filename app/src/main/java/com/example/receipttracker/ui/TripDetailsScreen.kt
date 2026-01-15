@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,8 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,15 +52,63 @@ fun TripDetailScreen(
     onAddReceiptClick: () -> Unit,
     onNavigateToReceipt: (Int) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    val handleBackNavigation = {
+        if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
+            viewModel.deleteTrip()
+        }
+        onNavigateUp()
+    }
+    BackHandler(onBack = handleBackNavigation)
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Trip Details") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+                    IconButton(onClick = {
+                        handleBackNavigation()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    val isTripValid = uiState.trip.name.isNotBlank() &&
+                            uiState.trip.startDate.isNotBlank() &&
+                            uiState.trip.endDate.isNotBlank()
+                    IconButton(
+                        onClick = {
+                            viewModel.saveTrip()
+                            onNavigateUp()
+                        },
+                        // TODO: Also disable unless changes have been made
+                        enabled = isTripValid
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_save),
+                            contentDescription = "Save"
+                        )
+                    }
+                    if (uiState.trip.tripId > 0) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                    }
+                    if (showDeleteDialog) {
+                        DeleteAlertDialog(
+                            item = ItemToBeDeleted.Trip,
+                            onDismiss = { showDeleteDialog = false },
+                            onConfirmDelete = {
+                                viewModel.deleteTrip()
+                                onNavigateUp()
+                            }
                         )
                     }
                 }
@@ -84,14 +133,6 @@ fun TripDetailScreen(
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
-                onSaveClick = {
-                    viewModel.saveTrip()
-                    onNavigateUp()
-                },
-                onDeleteClick = {
-                    viewModel.deleteTrip()
-                    onNavigateUp()
-                },
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
@@ -110,8 +151,6 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
-    onSaveClick: () -> Unit,
-    onDeleteClick: () -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
@@ -127,7 +166,6 @@ fun TripDetailContent(
         }
     }
     var showDatePicker by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -208,26 +246,6 @@ fun TripDetailContent(
                 }
             ) { TripDateRangePicker(state = datePickerState) }
         }
-        Button(
-            // TODO: Disable until fields are full
-            // TODO: Also disable unless changes have been made
-            onClick = onSaveClick,
-        ) {
-            Text("Save")
-        }
-        Button(
-            // TODO: Disable unless trip already in database
-            onClick = { showDeleteDialog = true }
-        ) {
-            Text("Delete")
-        }
-        if (showDeleteDialog) {
-            DeleteAlertDialog(
-                item = ItemToBeDeleted.Trip,
-                onDismiss = { showDeleteDialog = false },
-                onConfirmDelete = onDeleteClick
-            )
-        }
     }
 }
 
@@ -249,8 +267,6 @@ fun TripDetailsContentPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onSaveClick = {},
-            onDeleteClick = {},
             modifier = Modifier,
         )
     }
@@ -265,8 +281,6 @@ fun TripDetailNewPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
-            onSaveClick = {},
-            onDeleteClick = {},
             modifier = Modifier,
         )
     }

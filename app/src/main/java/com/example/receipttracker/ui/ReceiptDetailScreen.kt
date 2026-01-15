@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,9 +51,11 @@ fun ReceiptDetailScreen(
     tripEndDate: String,
     onNavigateUp: () -> Unit,
 ) {
+    val uiState by viewModel.userEdits.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Receipt Details") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
@@ -62,14 +64,52 @@ fun ReceiptDetailScreen(
                             contentDescription = "Back"
                         )
                     }
+                },
+                actions = {
+                    val currentReceipt = uiState
+                    if (currentReceipt != null) {
+                        val isReceiptValid = currentReceipt.date.isNotBlank() &&
+                                currentReceipt.amount > 0.0 &&
+                                currentReceipt.imageUri.isNotBlank()
+
+                        IconButton(onClick = {
+                            viewModel.updateReceipt()
+                            onNavigateUp()
+                            // TODO: Also disable unless changes have been made
+                        }, enabled = isReceiptValid) {
+                            Icon(
+                                painterResource(R.drawable.ic_save),
+                                contentDescription = "Save"
+                            )
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                        if (showDeleteDialog) {
+                            DeleteAlertDialog(
+                                item = ItemToBeDeleted.Receipt,
+                                onDismiss = { showDeleteDialog = false },
+                                onConfirmDelete = {
+                                    viewModel.deleteReceipt(currentReceipt.tripId)
+                                    onNavigateUp()
+                                }
+                            )
+                        }
+                    }
                 }
             )
         },
     ) { innerPadding ->
-        val edits by viewModel.userEdits.collectAsState()
-
-        if (edits == null) {
-            Box(Modifier.fillMaxSize()) { CircularProgressIndicator() }
+        if (uiState == null) {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
             // TODO: Add functionality to deal with screen rotation / different screen sizes
             Column(
@@ -78,20 +118,12 @@ fun ReceiptDetailScreen(
                     .fillMaxSize()
             ) {
                 ReceiptDetailContent(
-                    receipt = edits!!,
+                    receipt = uiState!!,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
                     onDateChange = viewModel::onDateChange,
                     onAmountChange = viewModel::onAmountChange,
                     onNotesChange = viewModel::onNotesChange,
-                    onUpdateClick = {
-                        viewModel.updateReceipt()
-                        onNavigateUp()
-                    },
-                    onDeleteClick = {
-                        viewModel.deleteReceipt()
-                        onNavigateUp()
-                    },
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
             }
@@ -107,8 +139,6 @@ fun ReceiptDetailContent(
     onDateChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
-    onUpdateClick: () -> Unit,
-    onDeleteClick: () -> Unit,
     modifier: Modifier,
 ) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
@@ -132,8 +162,6 @@ fun ReceiptDetailContent(
             }
         }
     )
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp),
@@ -145,7 +173,6 @@ fun ReceiptDetailContent(
             modifier = Modifier
                 .height(400.dp)
         )
-
         OutlinedTextField(
             value = receipt.date,
             label = { Text("Receipt Date") },
@@ -188,7 +215,6 @@ fun ReceiptDetailContent(
                 }
             ) { ReceiptDatePicker(state = datePickerState) }
         }
-
         OutlinedTextField(
             value = amountText,
             label = { Text("Receipt Amount") },
@@ -201,34 +227,10 @@ fun ReceiptDetailContent(
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
-
         OutlinedTextField(
             value = receipt.notes,
             label = { Text("Notes") },
             onValueChange = onNotesChange
         )
-
-        Button(
-            // TODO: Disable until fields are full
-            // TODO: Also disable unless changes have been made
-            onClick = onUpdateClick,
-        ) {
-            Text("Save")
-        }
-
-        Button(
-            onClick = { showDeleteDialog = true }
-            // TODO: Disable unless trip already in database
-        ) {
-            Text("Delete")
-        }
-
-        if (showDeleteDialog) {
-            DeleteAlertDialog(
-                item = ItemToBeDeleted.Receipt,
-                onDismiss = { showDeleteDialog = false },
-                onConfirmDelete = onDeleteClick
-            )
-        }
     }
 }

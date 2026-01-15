@@ -53,7 +53,6 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReceiptScreen(
-    tripId: Int,
     viewModel: TripDetailsViewModel,
     onReceiptSaved: () -> Unit,
 ) {
@@ -244,7 +243,6 @@ fun AddReceiptScreen(
                 enabled = capturedImageUri != null && selectedDate != "" && isAmountValid,
                 onClick = {
                     viewModel.addReceipt(
-                        tripId = tripId,
                         date = selectedDate,
                         imagePath = currentPhotoPath!!,
                         amount = amount.toDoubleOrNull() ?: 0.0,
