@@ -11,16 +11,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.AddReceiptScreen
+import com.example.receipttracker.ui.EditTripScreen
 import com.example.receipttracker.ui.HomeScreen
 import com.example.receipttracker.ui.HomeViewModel
 import com.example.receipttracker.ui.ReceiptDetailScreen
 import com.example.receipttracker.ui.ReceiptViewModel
-import com.example.receipttracker.ui.TripDetailScreen
 import com.example.receipttracker.ui.TripDetailsViewModel
+import com.example.receipttracker.ui.TripOverviewScreen
 import java.util.UUID
 
 data object TripList
-data class TripDetail(val id: Int)
+data class TripOverview(val id: Int)
+data class EditTrip(val id: Int)
 data class AddReceipt(val tripId: Int)
 data class ReceiptDetail(val receiptId: Int, val tripStartDate: String, val tripEndDate: String)
 
@@ -51,16 +53,16 @@ fun ReceiptTrackerApp() {
                         viewModel = homeViewModel,
                         onViewTripClick = { selectedTripId ->
                             backStack.add(
-                                TripDetail(
+                                TripOverview(
                                     selectedTripId
                                 )
                             )
                         },
-                        onAddTripClick = { backStack.add(TripDetail(-1)) }
+                        onAddTripClick = { backStack.add(EditTrip(-1)) }
                     )
                 }
 
-                is TripDetail -> NavEntry(key) {
+                is TripOverview -> NavEntry(key) {
                     val tripId = key.id
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
@@ -77,13 +79,41 @@ fun ReceiptTrackerApp() {
                         )
                     val start = viewModel.uiState.value.trip.startDate
                     val endDate = viewModel.uiState.value.trip.endDate
-                    TripDetailScreen(
+                    TripOverviewScreen(
                         viewModel = viewModel,
                         onNavigateUp = { backStack.removeLastOrNull() },
-                        onAddReceiptClick = {
-                            backStack.add(AddReceipt(tripId))
-                        },
-                        onNavigateToReceipt = { receiptId -> backStack.add(ReceiptDetail(receiptId, start, endDate)) }
+                        onAddReceiptClick = { backStack.add(AddReceipt(tripId)) },
+                        onEditTripClick = { backStack.add(EditTrip(tripId)) },
+                        onNavigateToReceipt = { receiptId ->
+                            backStack.add(
+                                ReceiptDetail(
+                                    receiptId,
+                                    start,
+                                    endDate
+                                )
+                            )
+                        }
+                    )
+                }
+
+                is EditTrip -> NavEntry(key) {
+                    val tripId = key.id
+                    val viewModelKey = if (tripId == -1) {
+                        "TripDetailVM_New_${UUID.randomUUID()}"
+                    } else {
+                        "TripDetailVM_$tripId"
+                    }
+                    val viewModel: TripDetailsViewModel =
+                        viewModel(
+                            key = viewModelKey,
+                            factory = TripDetailsViewModel.provideFactory(
+                                tripId,
+                                repository
+                            )
+                        )
+                    EditTripScreen(
+                        viewModel = viewModel,
+                        onNavigateUp = { backStack.removeLastOrNull() },
                     )
                 }
 

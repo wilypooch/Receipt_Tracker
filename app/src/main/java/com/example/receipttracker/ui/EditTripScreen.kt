@@ -8,11 +8,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -46,11 +44,9 @@ import com.example.receipttracker.ui.utils.convertMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TripDetailScreen(
+fun EditTripScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: () -> Unit,
-    onAddReceiptClick: () -> Unit,
-    onNavigateToReceipt: (Int) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -61,6 +57,7 @@ fun TripDetailScreen(
         onNavigateUp()
     }
     BackHandler(onBack = handleBackNavigation)
+    // TODO: Dialog confirming changes are unsaved if that's the case when a user goes back
 
     Scaffold(
         topBar = {
@@ -92,6 +89,7 @@ fun TripDetailScreen(
                             painterResource(R.drawable.ic_save),
                             contentDescription = "Save"
                         )
+                        // TODO: Add toast to confirm save was successful
                     }
                     if (uiState.trip.tripId > 0) {
                         IconButton(onClick = { showDeleteDialog = true }) {
@@ -114,12 +112,8 @@ fun TripDetailScreen(
                 }
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddReceiptClick) {
-                Icon(Icons.Filled.Add, "Add Receipt")
-            }
-        }
-    ) { innerPadding ->
+
+        ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
         // TODO: Add functionality to deal with screen rotation / different screen sizes
@@ -134,12 +128,6 @@ fun TripDetailScreen(
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
                 modifier = Modifier.padding(horizontal = 16.dp),
-            )
-
-            ReceiptList(
-                items = uiState.receipts,
-                onReceiptClick = onNavigateToReceipt,
-                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -277,7 +265,7 @@ fun TripDetailsContentPreview() {
 fun TripDetailNewPreview() {
     ReceiptTrackerTheme {
         TripDetailContent(
-            uiState = TripDetailsUiState(), // Default empty state
+            uiState = TripDetailsUiState(),
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
