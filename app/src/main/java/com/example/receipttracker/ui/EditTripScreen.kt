@@ -39,6 +39,7 @@ import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.TripDateRangePicker
+import com.example.receipttracker.ui.utils.UnsavedChangesDialog
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 
@@ -56,15 +57,38 @@ fun EditTripScreen(
     }
     val tripToDisplay = draft ?: uiState.trip
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val handleBackNavigation = {
-        if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
-            viewModel.deleteTrip()
-        }
-        viewModel.cancelEditing()
-        onNavigateUp(null)
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+    val hasUnsavedChanges = remember(draft, uiState.trip) {
+        draft != null && draft != uiState.trip
     }
+
+    val handleBackNavigation = {
+        if (hasUnsavedChanges) {
+            showUnsavedDialog = true
+        } else {
+            if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
+                viewModel.deleteTrip()
+            }
+            viewModel.cancelEditing()
+            onNavigateUp(null)
+        }
+    }
+
     BackHandler(onBack = handleBackNavigation)
-    // TODO: Dialog confirming changes are unsaved if that's the case when a user goes back
+
+    if (showUnsavedDialog) {
+        UnsavedChangesDialog(
+            onConfirmDiscard = {
+                showUnsavedDialog = false
+                if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
+                    viewModel.deleteTrip()
+                }
+                viewModel.cancelEditing()
+                onNavigateUp(null)
+            },
+            onDismiss = { showUnsavedDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
