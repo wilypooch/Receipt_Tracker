@@ -30,23 +30,18 @@ class TripDetailsViewModel(
     private val repository: TrackerRepository,
 ) :
     ViewModel() {
-
     private val _currentTripId = MutableStateFlow(initialTripId)
-    private val _userEdits = MutableStateFlow(Trip())
+    private val _draftTrip = MutableStateFlow<Trip?>(null)
+    val draftTrip: StateFlow<Trip?> = _draftTrip
     val uiState: StateFlow<TripDetailsUiState> =
         _currentTripId.filter { it != -1 }.flatMapLatest { id ->
             val tripFromDbStream = repository.getTripStream(id).filterNotNull()
             val receiptsFromDbStream = repository.getAllReceiptsForTripStream(id)
 
-            combine(tripFromDbStream, receiptsFromDbStream, _userEdits) { tripDb, receipts, edits ->
+            combine(tripFromDbStream, receiptsFromDbStream) { tripDb, receipts ->
                 val calculatedTotal = receipts.sumOf { it.amount }
                 TripDetailsUiState(
-                    trip = tripDb.copy(
-                        name = edits.name.ifBlank { tripDb.name },
-                        startDate = edits.startDate.ifBlank { tripDb.startDate },
-                        endDate = edits.endDate.ifBlank { tripDb.endDate },
-                        totalAmount = calculatedTotal
-                    ), receipts = receipts
+                    trip = tripDb, receipts = receipts
                 )
             }
         }.stateIn(
@@ -64,22 +59,32 @@ class TripDetailsViewModel(
         }
     }
 
+    fun startEditing() {
+        _draftTrip.value = uiState.value.trip
+    }
+
+    fun cancelEditing() {
+        _draftTrip.value = null
+    }
+
     fun onNameChange(value: String) {
-        _userEdits.update { it.copy(name = value) }
+        _draftTrip.update { it?.copy(name = value) }
     }
 
     fun onStartDateChange(value: String) {
-        _userEdits.update { it.copy(startDate = value) }
+        _draftTrip.update { it?.copy(startDate = value) }
     }
 
     fun onEndDateChange(value: String) {
-        _userEdits.update { it.copy(endDate = value) }
+        _draftTrip.update { it?.copy(endDate = value) }
     }
 
     fun saveTrip() {
         viewModelScope.launch {
-            val currentTrip = uiState.value.trip
-            repository.updateTrip(currentTrip)
+            _draftTrip.value?.let { updatedTrip ->
+                repository.updateTrip(updatedTrip)
+                _draftTrip.value = null
+            }
         }
     }
 

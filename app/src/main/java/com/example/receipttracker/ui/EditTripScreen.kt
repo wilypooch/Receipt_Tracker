@@ -48,12 +48,19 @@ fun EditTripScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: (String?) -> Unit,
 ) {
+    val draft by viewModel.draftTrip.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.startEditing()
+    }
+    val tripToDisplay = draft ?: uiState.trip
     var showDeleteDialog by remember { mutableStateOf(false) }
     val handleBackNavigation = {
-        if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
+        if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
             viewModel.deleteTrip()
         }
+        viewModel.cancelEditing()
         onNavigateUp(null)
     }
     BackHandler(onBack = handleBackNavigation)
@@ -74,9 +81,9 @@ fun EditTripScreen(
                     }
                 },
                 actions = {
-                    val isTripValid = uiState.trip.name.isNotBlank() &&
-                            uiState.trip.startDate.isNotBlank() &&
-                            uiState.trip.endDate.isNotBlank()
+                    val isTripValid = tripToDisplay.name.isNotBlank() &&
+                            tripToDisplay.startDate.isNotBlank() &&
+                            tripToDisplay.endDate.isNotBlank()
                     IconButton(
                         onClick = {
                             viewModel.saveTrip()
@@ -90,7 +97,7 @@ fun EditTripScreen(
                             contentDescription = "Save"
                         )
                     }
-                    if (uiState.trip.tripId > 0) {
+                    if (tripToDisplay.tripId > 0) {
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -113,8 +120,6 @@ fun EditTripScreen(
         },
 
         ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
-
         // TODO: Add functionality to deal with screen rotation / different screen sizes
         Column(
             modifier = Modifier
@@ -122,7 +127,7 @@ fun EditTripScreen(
                 .fillMaxSize()
         ) {
             TripDetailContent(
-                uiState = uiState,
+                trip = tripToDisplay,
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
@@ -134,18 +139,18 @@ fun EditTripScreen(
 
 @Composable
 fun TripDetailContent(
-    uiState: TripDetailsUiState,
+    trip: Trip,
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
-    val startMillis = remember(uiState.trip.startDate) {
-        convertDateStringToMillis(uiState.trip.startDate)
+    val startMillis = remember(trip.startDate) {
+        convertDateStringToMillis(trip.startDate)
     }
-    val endMillis = remember(uiState.trip.endDate) {
-        convertDateStringToMillis(uiState.trip.endDate)
+    val endMillis = remember(trip.endDate) {
+        convertDateStringToMillis(trip.endDate)
     }
     LaunchedEffect(startMillis, endMillis) {
         if (startMillis != null && endMillis != null) {
@@ -162,12 +167,12 @@ fun TripDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = uiState.trip.name,
+            value = trip.name,
             label = { Text("Trip Name") },
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = uiState.trip.startDate,
+            value = trip.startDate,
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -187,7 +192,7 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = uiState.trip.endDate,
+            value = trip.endDate,
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
@@ -239,18 +244,17 @@ fun TripDetailContent(
 @Preview(showBackground = true, name = "Existing Trip")
 @Composable
 fun TripDetailsContentPreview() {
-    val sampleState = TripDetailsUiState(
+    val sampleTrip =
         Trip(
             name = "Rust Training In Manchester",
             startDate = "01/10/2025",
             endDate = "07/10/2025",
             totalAmount = 2500.00
         )
-    )
 
     ReceiptTrackerTheme {
         TripDetailContent(
-            uiState = sampleState,
+            trip = sampleTrip,
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
@@ -264,7 +268,7 @@ fun TripDetailsContentPreview() {
 fun TripDetailNewPreview() {
     ReceiptTrackerTheme {
         TripDetailContent(
-            uiState = TripDetailsUiState(),
+            trip = Trip(),
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
