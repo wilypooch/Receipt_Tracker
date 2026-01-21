@@ -113,8 +113,7 @@ fun EditTripScreen(
                             viewModel.saveTrip()
                             onNavigateUp("saved")
                         },
-                        // TODO: Also disable unless changes have been made
-                        enabled = isTripValid
+                        enabled = isTripValid && hasUnsavedChanges
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_save),
