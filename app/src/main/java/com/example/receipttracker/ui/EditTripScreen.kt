@@ -8,11 +8,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -41,26 +39,56 @@ import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.TripDateRangePicker
+import com.example.receipttracker.ui.utils.UnsavedChangesDialog
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TripDetailScreen(
+fun EditTripScreen(
     viewModel: TripDetailsViewModel,
-    onNavigateUp: () -> Unit,
-    onAddReceiptClick: () -> Unit,
-    onNavigateToReceipt: (Int) -> Unit,
+    onNavigateUp: (String?) -> Unit,
 ) {
+    val draft by viewModel.draftTrip.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    val handleBackNavigation = {
-        if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
-            viewModel.deleteTrip()
-        }
-        onNavigateUp()
+
+    LaunchedEffect(Unit) {
+        viewModel.startEditing()
     }
+    val tripToDisplay = draft ?: uiState.trip
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+    val hasUnsavedChanges = remember(draft, uiState.trip) {
+        draft != null && draft != uiState.trip
+    }
+
+    val handleBackNavigation = {
+        if (hasUnsavedChanges) {
+            showUnsavedDialog = true
+        } else {
+            if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
+                viewModel.deleteTrip()
+            }
+            viewModel.cancelEditing()
+            onNavigateUp(null)
+        }
+    }
+
     BackHandler(onBack = handleBackNavigation)
+
+    if (showUnsavedDialog) {
+        UnsavedChangesDialog(
+            onConfirmDiscard = {
+                showUnsavedDialog = false
+                if (tripToDisplay.name.isBlank() && uiState.receipts.isEmpty()) {
+                    viewModel.deleteTrip()
+                }
+                viewModel.cancelEditing()
+                onNavigateUp(null)
+            },
+            onDismiss = { showUnsavedDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -77,23 +105,22 @@ fun TripDetailScreen(
                     }
                 },
                 actions = {
-                    val isTripValid = uiState.trip.name.isNotBlank() &&
-                            uiState.trip.startDate.isNotBlank() &&
-                            uiState.trip.endDate.isNotBlank()
+                    val isTripValid = tripToDisplay.name.isNotBlank() &&
+                            tripToDisplay.startDate.isNotBlank() &&
+                            tripToDisplay.endDate.isNotBlank()
                     IconButton(
                         onClick = {
                             viewModel.saveTrip()
-                            onNavigateUp()
+                            onNavigateUp("saved")
                         },
-                        // TODO: Also disable unless changes have been made
-                        enabled = isTripValid
+                        enabled = isTripValid && hasUnsavedChanges
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_save),
                             contentDescription = "Save"
                         )
                     }
-                    if (uiState.trip.tripId > 0) {
+                    if (tripToDisplay.tripId > 0) {
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -107,21 +134,15 @@ fun TripDetailScreen(
                             onDismiss = { showDeleteDialog = false },
                             onConfirmDelete = {
                                 viewModel.deleteTrip()
-                                onNavigateUp()
+                                onNavigateUp("deleted")
                             }
                         )
                     }
                 }
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddReceiptClick) {
-                Icon(Icons.Filled.Add, "Add Receipt")
-            }
-        }
-    ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
 
+        ) { innerPadding ->
         // TODO: Add functionality to deal with screen rotation / different screen sizes
         Column(
             modifier = Modifier
@@ -129,17 +150,11 @@ fun TripDetailScreen(
                 .fillMaxSize()
         ) {
             TripDetailContent(
-                uiState = uiState,
+                trip = tripToDisplay,
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
                 modifier = Modifier.padding(horizontal = 16.dp),
-            )
-
-            ReceiptList(
-                items = uiState.receipts,
-                onReceiptClick = onNavigateToReceipt,
-                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -147,18 +162,18 @@ fun TripDetailScreen(
 
 @Composable
 fun TripDetailContent(
-    uiState: TripDetailsUiState,
+    trip: Trip,
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
-    val startMillis = remember(uiState.trip.startDate) {
-        convertDateStringToMillis(uiState.trip.startDate)
+    val startMillis = remember(trip.startDate) {
+        convertDateStringToMillis(trip.startDate)
     }
-    val endMillis = remember(uiState.trip.endDate) {
-        convertDateStringToMillis(uiState.trip.endDate)
+    val endMillis = remember(trip.endDate) {
+        convertDateStringToMillis(trip.endDate)
     }
     LaunchedEffect(startMillis, endMillis) {
         if (startMillis != null && endMillis != null) {
@@ -175,12 +190,12 @@ fun TripDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = uiState.trip.name,
+            value = trip.name,
             label = { Text("Trip Name") },
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = uiState.trip.startDate,
+            value = trip.startDate,
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -200,7 +215,7 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = uiState.trip.endDate,
+            value = trip.endDate,
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
@@ -252,18 +267,17 @@ fun TripDetailContent(
 @Preview(showBackground = true, name = "Existing Trip")
 @Composable
 fun TripDetailsContentPreview() {
-    val sampleState = TripDetailsUiState(
+    val sampleTrip =
         Trip(
             name = "Rust Training In Manchester",
             startDate = "01/10/2025",
             endDate = "07/10/2025",
             totalAmount = 2500.00
         )
-    )
 
     ReceiptTrackerTheme {
         TripDetailContent(
-            uiState = sampleState,
+            trip = sampleTrip,
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
@@ -277,7 +291,7 @@ fun TripDetailsContentPreview() {
 fun TripDetailNewPreview() {
     ReceiptTrackerTheme {
         TripDetailContent(
-            uiState = TripDetailsUiState(), // Default empty state
+            trip = Trip(),
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
