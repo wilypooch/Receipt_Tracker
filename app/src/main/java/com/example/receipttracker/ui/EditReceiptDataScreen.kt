@@ -45,7 +45,7 @@ import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReceiptDetailScreen(
+fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     tripStartDate: String,
     tripEndDate: String,
@@ -117,7 +117,7 @@ fun ReceiptDetailScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                ReceiptDetailContent(
+                EditReceiptDataContent(
                     receipt = uiState!!,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
@@ -132,7 +132,7 @@ fun ReceiptDetailScreen(
 }
 
 @Composable
-fun ReceiptDetailContent(
+fun EditReceiptDataContent(
     receipt: Receipt,
     tripStartDate: String,
     tripEndDate: String,

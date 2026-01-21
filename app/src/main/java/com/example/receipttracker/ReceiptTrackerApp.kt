@@ -17,7 +17,7 @@ import com.example.receipttracker.ui.AddReceiptScreen
 import com.example.receipttracker.ui.EditTripScreen
 import com.example.receipttracker.ui.HomeScreen
 import com.example.receipttracker.ui.HomeViewModel
-import com.example.receipttracker.ui.ReceiptDetailScreen
+import com.example.receipttracker.ui.EditReceiptDataScreen
 import com.example.receipttracker.ui.ReceiptViewModel
 import com.example.receipttracker.ui.TripDetailsViewModel
 import com.example.receipttracker.ui.TripOverviewScreen
@@ -27,7 +27,7 @@ data object TripList
 data class TripOverview(val id: Int)
 data class EditTrip(val id: Int)
 data class AddReceipt(val tripId: Int)
-data class ReceiptDetail(val receiptId: Int, val tripStartDate: String, val tripEndDate: String)
+data class EditReceipt(val receiptId: Int, val tripStartDate: String, val tripEndDate: String)
 
 
 @Suppress("UNCHECKED_CAST")
@@ -97,7 +97,7 @@ fun ReceiptTrackerApp() {
                         onEditTripClick = { backStack.add(EditTrip(tripId)) },
                         onNavigateToReceipt = { receiptId ->
                             backStack.add(
-                                ReceiptDetail(
+                                EditReceipt(
                                     receiptId,
                                     start,
                                     endDate
@@ -162,7 +162,7 @@ fun ReceiptTrackerApp() {
                     )
                 }
 
-                is ReceiptDetail -> NavEntry(key) {
+                is EditReceipt -> NavEntry(key) {
                     val receiptId = key.receiptId
                     val tripStartDate = key.tripStartDate
                     val tripEndDate = key.tripEndDate
@@ -170,7 +170,7 @@ fun ReceiptTrackerApp() {
                         key = "ReceiptDetailVM_$receiptId",
                         factory = ReceiptViewModel.provideFactory(receiptId, repository)
                     )
-                    ReceiptDetailScreen(
+                    EditReceiptDataScreen(
                         viewModel = viewModel,
                         tripStartDate = tripStartDate,
                         tripEndDate = tripEndDate,
