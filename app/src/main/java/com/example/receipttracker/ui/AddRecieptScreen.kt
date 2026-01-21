@@ -1,6 +1,7 @@
 package com.example.receipttracker.ui
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,8 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +57,7 @@ import java.util.TimeZone
 @Composable
 fun AddReceiptScreen(
     viewModel: TripDetailsViewModel,
-    onReceiptSaved: () -> Unit,
+    onNavigateUp: (String?) -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -117,11 +120,43 @@ fun AddReceiptScreen(
             }
         }
     )
-
+    val handleBackNavigation = { onNavigateUp(null) }
+    BackHandler(onBack = handleBackNavigation)
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text("Add Receipt") })
+            TopAppBar(
+                title = { Text("Add Receipt") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        handleBackNavigation()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            viewModel.addReceipt(
+                                date = selectedDate,
+                                imagePath = currentPhotoPath!!,
+                                amount = amount.toDoubleOrNull() ?: 0.0,
+                                notes = notes
+                            )
+                            onNavigateUp("saved")
+                        },
+                        enabled = capturedImageUri != null && selectedDate != "" && isAmountValid,
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_save),
+                            contentDescription = "Save"
+                        )
+                    }
+                }
+            )
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
@@ -236,24 +271,6 @@ fun AddReceiptScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                enabled = capturedImageUri != null && selectedDate != "" && isAmountValid,
-                onClick = {
-                    viewModel.addReceipt(
-                        date = selectedDate,
-                        imagePath = currentPhotoPath!!,
-                        amount = amount.toDoubleOrNull() ?: 0.0,
-                        notes = notes
-                    )
-                    onReceiptSaved()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Save Receipt")
-            }
         }
     }
 }
