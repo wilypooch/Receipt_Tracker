@@ -2,8 +2,11 @@ package com.example.receipttracker
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +34,7 @@ data class ReceiptDetail(val receiptId: Int, val tripStartDate: String, val trip
 @Composable
 fun ReceiptTrackerApp() {
     val backStack = remember { mutableStateListOf<Any>(TripList) }
+    var snackbarMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val application = context.applicationContext as ReceiptTrackerApplication
     val repository = application.container.trackerRepository
@@ -58,7 +62,9 @@ fun ReceiptTrackerApp() {
                                 )
                             )
                         },
-                        onAddTripClick = { backStack.add(EditTrip(-1)) }
+                        onAddTripClick = { backStack.add(EditTrip(-1)) },
+                        snackbarMessage = snackbarMessage,
+                        onSnackbarShown = { snackbarMessage = null }
                     )
                 }
 
@@ -81,7 +87,12 @@ fun ReceiptTrackerApp() {
                     val endDate = viewModel.uiState.value.trip.endDate
                     TripOverviewScreen(
                         viewModel = viewModel,
-                        onNavigateUp = { backStack.removeLastOrNull() },
+                        onNavigateUp = { result ->
+                            if (result == "deleted") {
+                                snackbarMessage = "Trip Deleted"
+                            }
+                            backStack.removeLastOrNull()
+                        },
                         onAddReceiptClick = { backStack.add(AddReceipt(tripId)) },
                         onEditTripClick = { backStack.add(EditTrip(tripId)) },
                         onNavigateToReceipt = { receiptId ->
@@ -92,7 +103,9 @@ fun ReceiptTrackerApp() {
                                     endDate
                                 )
                             )
-                        }
+                        },
+                        snackbarMessage = snackbarMessage,
+                        onSnackbarShown = { snackbarMessage = null }
                     )
                 }
 
@@ -113,7 +126,21 @@ fun ReceiptTrackerApp() {
                         )
                     EditTripScreen(
                         viewModel = viewModel,
-                        onNavigateUp = { backStack.removeLastOrNull() },
+                        onNavigateUp = { result ->
+                            when (result) {
+                                "saved" -> {
+                                    snackbarMessage = "Trip Saved"
+                                    backStack.removeLastOrNull()
+                                }
+
+                                "deleted" -> {
+                                    snackbarMessage = "Trip Deleted"
+                                    backStack.retainAll { it is TripList }
+                                }
+
+                                else -> backStack.removeLastOrNull()
+                            }
+                        },
                     )
                 }
 

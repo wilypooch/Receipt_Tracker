@@ -14,9 +14,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,21 +34,31 @@ import com.example.receipttracker.ui.utils.ItemToBeDeleted
 @Composable
 fun TripOverviewScreen(
     viewModel: TripDetailsViewModel,
-    onNavigateUp: () -> Unit,
+    onNavigateUp: (String?) -> Unit,
     onEditTripClick: () -> Unit,
     onAddReceiptClick: () -> Unit,
     onNavigateToReceipt: (Int) -> Unit,
+    snackbarMessage: String? = null,
+    onSnackbarShown: () -> Unit = {},
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onSnackbarShown()
+        }
+    }
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     val handleBackNavigation = {
         if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
             viewModel.deleteTrip()
         }
-        onNavigateUp()
+        onNavigateUp(null)
     }
     BackHandler(onBack = handleBackNavigation)
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(text = uiState.trip.name) },
@@ -84,7 +97,7 @@ fun TripOverviewScreen(
                             onDismiss = { showDeleteDialog = false },
                             onConfirmDelete = {
                                 viewModel.deleteTrip()
-                                onNavigateUp()
+                                onNavigateUp("deleted")
                             }
                         )
                     }

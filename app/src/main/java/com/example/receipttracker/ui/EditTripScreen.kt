@@ -46,7 +46,7 @@ import com.example.receipttracker.ui.utils.convertMillisToDate
 @Composable
 fun EditTripScreen(
     viewModel: TripDetailsViewModel,
-    onNavigateUp: () -> Unit,
+    onNavigateUp: (String?) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -54,7 +54,7 @@ fun EditTripScreen(
         if (uiState.trip.name.isBlank() && uiState.receipts.isEmpty()) {
             viewModel.deleteTrip()
         }
-        onNavigateUp()
+        onNavigateUp(null)
     }
     BackHandler(onBack = handleBackNavigation)
     // TODO: Dialog confirming changes are unsaved if that's the case when a user goes back
@@ -80,7 +80,7 @@ fun EditTripScreen(
                     IconButton(
                         onClick = {
                             viewModel.saveTrip()
-                            onNavigateUp()
+                            onNavigateUp("saved")
                         },
                         // TODO: Also disable unless changes have been made
                         enabled = isTripValid
@@ -89,7 +89,6 @@ fun EditTripScreen(
                             painterResource(R.drawable.ic_save),
                             contentDescription = "Save"
                         )
-                        // TODO: Add toast to confirm save was successful
                     }
                     if (uiState.trip.tripId > 0) {
                         IconButton(onClick = { showDeleteDialog = true }) {
@@ -105,7 +104,7 @@ fun EditTripScreen(
                             onDismiss = { showDeleteDialog = false },
                             onConfirmDelete = {
                                 viewModel.deleteTrip()
-                                onNavigateUp()
+                                onNavigateUp("deleted")
                             }
                         )
                     }
