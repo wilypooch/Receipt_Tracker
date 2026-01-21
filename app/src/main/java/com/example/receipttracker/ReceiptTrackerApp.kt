@@ -153,7 +153,12 @@ fun ReceiptTrackerApp() {
                     )
                     AddReceiptScreen(
                         viewModel = viewModel,
-                        onReceiptSaved = { backStack.removeLastOrNull() }
+                        onNavigateUp = { result ->
+                            if (result == "saved") {
+                                snackbarMessage = "Receipt Saved"
+                            }
+                            backStack.removeLastOrNull()
+                        }
                     )
                 }
 
