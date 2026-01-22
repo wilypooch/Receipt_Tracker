@@ -78,6 +78,13 @@ class TripDetailsViewModel(
         _draftTrip.update { it?.copy(endDate = value) }
     }
 
+    fun onCurrencyChange(value: String) {
+        _draftTrip.update {
+            val updated = it?.copy(currencyCode = value)
+            updated
+        }
+    }
+
     fun saveTrip() {
         viewModelScope.launch {
             _draftTrip.value?.let { updatedTrip ->

@@ -89,9 +89,9 @@ fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
             items = listOf(
-                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", 400.00),
-                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993", 20.00),
-                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", 4888.86)
+                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", "GBP", 400.00),
+                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993","GBP", 20.00),
+                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", "GBP", 4888.86)
             ), onTripClick = {}
         )
     }

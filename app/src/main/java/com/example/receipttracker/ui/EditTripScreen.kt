@@ -34,8 +34,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
+import com.example.receipttracker.data.AppCurrency.Companion.currencyFromCode
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
+import com.example.receipttracker.ui.utils.CurrencyDropdown
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.TripDateRangePicker
@@ -154,6 +156,7 @@ fun EditTripScreen(
                 onNameChange = viewModel::onNameChange,
                 onStartDateChange = viewModel::onStartDateChange,
                 onEndDateChange = viewModel::onEndDateChange,
+                onCurrencyChange = viewModel::onCurrencyChange,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
@@ -166,6 +169,7 @@ fun TripDetailContent(
     onNameChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
     onEndDateChange: (String) -> Unit,
+    onCurrencyChange: (String) -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
@@ -261,6 +265,9 @@ fun TripDetailContent(
                 }
             ) { TripDateRangePicker(state = datePickerState) }
         }
+        CurrencyDropdown(
+            currencyFromCode(trip.currencyCode),
+            onCurrencySelected = { selectedAppCurrency -> onCurrencyChange(selectedAppCurrency.code) })
     }
 }
 
@@ -281,6 +288,7 @@ fun TripDetailsContentPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
+            onCurrencyChange = {},
             modifier = Modifier,
         )
     }
@@ -295,6 +303,7 @@ fun TripDetailNewPreview() {
             onNameChange = {},
             onStartDateChange = {},
             onEndDateChange = {},
+            onCurrencyChange = {},
             modifier = Modifier,
         )
     }
