@@ -15,6 +15,8 @@ data class Trip(
     val startDate: String = "",
     @ColumnInfo(name = "end_date")
     val endDate: String = "",
+    @ColumnInfo(name = "currency")
+    val currencyCode: String = "GBP",
     @ColumnInfo(name = "total_amount")
     val totalAmount: Double = 0.0,
 )
