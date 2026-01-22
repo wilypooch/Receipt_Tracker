@@ -21,6 +21,10 @@ interface ReceiptDao {
     @Query("SELECT * FROM receipt WHERE receipt_id = :id")
     fun getReceipt(id: Int): Flow<Receipt?>
 
+    // Non-flow version that is used when deleting receipts
+    @Query("SELECT * FROM receipt WHERE receipt_Id = :id")
+    suspend fun getReceiptById(id: Int): Receipt?
+
     @Query("SELECT * FROM receipt WHERE trip_id = :id ORDER BY receipt_id")
     fun getAllReceiptsForTrip(id: Int): Flow<List<Receipt>>
 

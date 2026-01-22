@@ -19,63 +19,64 @@ class ReceiptViewModel(
     private val repository: TrackerRepository,
 ) : ViewModel() {
 
-    val receiptState: StateFlow<Receipt?> = repository.getReceiptStream(receiptId).stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), null
-    )
-    private val _userEdits = MutableStateFlow<Receipt?>(null)
-
-    val userEdits: StateFlow<Receipt?> = _userEdits.asStateFlow()
+    val receiptState: StateFlow<Receipt?> =
+        repository.getReceiptStream(receiptId).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+    private val _draftReceipt = MutableStateFlow<Receipt?>(null)
+    val draftReceipt: StateFlow<Receipt?> = _draftReceipt.asStateFlow()
 
     init {
         viewModelScope.launch {
             receiptState.collect { dbReceipt ->
                 // Only initialize edits if user hasn't started editing yet
-                if (dbReceipt != null && _userEdits.value == null) {
-                    _userEdits.value = dbReceipt
+                if (dbReceipt != null && _draftReceipt.value == null) {
+                    _draftReceipt.value = dbReceipt
                 }
             }
         }
     }
 
+    fun startEditing() {
+        _draftReceipt.value = receiptState.value
+    }
+
+    fun cancelEditing() {
+        _draftReceipt.value = null
+    }
+
     fun onDateChange(newDate: String) {
-        _userEdits.update { it?.copy(date = newDate) }
+        _draftReceipt.update { it?.copy(date = newDate) }
     }
 
     fun onAmountChange(newAmount: Double) {
-        _userEdits.update { it?.copy(amount = newAmount) }
+        _draftReceipt.update { it?.copy(amount = newAmount) }
     }
 
     fun onNotesChange(newNotes: String) {
-        _userEdits.update { it?.copy(notes = newNotes) }
+        _draftReceipt.update { it?.copy(notes = newNotes) }
     }
 
     fun updateReceipt() {
         viewModelScope.launch {
-            _userEdits.value?.let { repository.updateReceipt(it) }
+            _draftReceipt.value?.let { repository.updateReceipt(it) }
         }
     }
 
     fun deleteReceipt(tripId: Int) {
         viewModelScope.launch {
-            val receiptToDelete = receiptState.value
-            val amountToRemove = receiptToDelete?.amount ?: 0.0
-            if (receiptToDelete != null) {
-                try {
-                    val file = java.io.File(receiptToDelete.imageUri)
-                    if (file.exists()) {
-                        file.delete()
-                    }
-                } catch (e: Exception) {
-                    Log.e("ReceiptVM", "Failed to delete image file", e)
+            val receiptToDelete = receiptState.value ?: return@launch
+            try {
+                val file = java.io.File(receiptToDelete.imageUri)
+                if (file.exists()) {
+                    file.delete()
                 }
+            } catch (e: Exception) {
+                Log.e("ReceiptVM", "Failed to delete image file", e)
             }
-            val actualTrip = repository.getTripById(tripId)
-            if (actualTrip != null) {
-                val newTotal =
-                    (actualTrip.totalAmount - amountToRemove).coerceAtLeast(0.0)
-                repository.updateTrip(actualTrip.copy(totalAmount = newTotal))
-            }
-            repository.deleteReceiptById(receiptId)
+            repository.deleteReceiptAndUpdateTripTotal(receiptId, tripId)
         }
     }
 
