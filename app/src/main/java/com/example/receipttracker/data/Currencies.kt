@@ -7,11 +7,11 @@ enum class AppCurrency(
 ) {
     GBP("GBP", "£", "British Pound (GBP)"),
     AUD("AUD", "\$A", "Australian Dollar (AUD)"),
-    CAD("CAD", "Can$","Canadian Dollar (CAD)"),
-    CHF("CHF","CHF", "Swiss Franc (CHF)"),
+    CAD("CAD", "Can$", "Canadian Dollar (CAD)"),
+    CHF("CHF", "CHF", "Swiss Franc (CHF)"),
     EUR("EUR", "€", "Euro (EUR)"),
-    JPY("JPY","¥","Japanese Yen (JPY)"),
-    NZD("NZD","\$NZ","New Zealand Dollar (NZD)"),
+    JPY("JPY", "¥", "Japanese Yen (JPY)"),
+    NZD("NZD", "\$NZ", "New Zealand Dollar (NZD)"),
     USD("USD", "$", "US Dollar (USD)"),
     ;
 
