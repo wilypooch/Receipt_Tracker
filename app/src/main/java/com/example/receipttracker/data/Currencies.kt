@@ -3,7 +3,7 @@ package com.example.receipttracker.data
 enum class AppCurrency(
     val code: String,
     val symbol: String,
-    val displayName: String
+    val displayName: String,
 ) {
     GBP("GBP", "£", "British Pound (GBP)"),
     AUD("AUD", "\$A", "Australian Dollar (AUD)"),
@@ -18,5 +18,9 @@ enum class AppCurrency(
     companion object {
         fun currencyFromCode(code: String): AppCurrency =
             entries.find { it.code == code } ?: GBP
+
+        fun symbolFromCode(code: String): String =
+            currencyFromCode(code).symbol
     }
+
 }

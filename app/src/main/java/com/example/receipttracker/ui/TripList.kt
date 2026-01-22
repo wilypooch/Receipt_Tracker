@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 
@@ -37,6 +38,7 @@ fun TripList(
                 tripName = item.name,
                 tripStartDate = item.startDate,
                 tripTotal = item.totalAmount,
+                tripCurrencyCode = item.currencyCode,
                 onClick = { onTripClick(item.tripId) }
             )
         }
@@ -48,6 +50,7 @@ fun TripListCard(
     tripName: String,
     tripStartDate: String,
     tripTotal: Double,
+    tripCurrencyCode: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,8 +78,7 @@ fun TripListCard(
                     Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
                 }
                 Column {
-                    // TODO: Format currency
-                    Text(text = tripTotal.toString(), style = MaterialTheme.typography.labelMedium)
+                    Text(text = "${symbolFromCode(tripCurrencyCode)} $tripTotal", style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
@@ -101,6 +103,6 @@ fun TripListPreview() {
 @Composable
 fun TripListCardPreview() {
     ReceiptTrackerTheme {
-        TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, onClick = {})
+        TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, tripCurrencyCode = "GBP", onClick = {})
     }
 }
