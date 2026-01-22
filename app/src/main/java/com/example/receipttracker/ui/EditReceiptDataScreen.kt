@@ -1,5 +1,6 @@
 package com.example.receipttracker.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,7 @@ import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
+import com.example.receipttracker.ui.utils.UnsavedChangesDialog
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 import java.util.Calendar
@@ -49,59 +52,89 @@ fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     tripStartDate: String,
     tripEndDate: String,
-    onNavigateUp: () -> Unit,
+    onNavigateUp: (String?) -> Unit,
 ) {
-    val uiState by viewModel.userEdits.collectAsState()
+    val draft by viewModel.draftReceipt.collectAsState()
+    val uiState by viewModel.receiptState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.startEditing()
+    }
+    val receiptToDisplay = draft ?: uiState
     var showDeleteDialog by remember { mutableStateOf(false) }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Receipt Details") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+    val hasUnsavedChanges = remember(draft, uiState) { draft != null && draft != uiState }
+
+    val handleBackNavigation = {
+        if (hasUnsavedChanges) {
+            showUnsavedDialog = true
+        } else {
+            viewModel.cancelEditing()
+            onNavigateUp(null)
+        }
+    }
+
+    BackHandler(onBack = handleBackNavigation)
+
+    if (showUnsavedDialog) {
+        UnsavedChangesDialog(
+            onConfirmDiscard = {
+                showUnsavedDialog = false
+                viewModel.cancelEditing()
+                onNavigateUp(null)
+            },
+            onDismiss = { showUnsavedDialog = false })
+    }
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text("Receipt Details") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    handleBackNavigation()
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            },
+            actions = {
+                if (receiptToDisplay != null) {
+                    val isReceiptValid = receiptToDisplay.date.isNotBlank() &&
+                            receiptToDisplay.amount > 0.0 &&
+                            receiptToDisplay.imageUri.isNotBlank()
+
+                    IconButton(
+                        onClick = {
+                            viewModel.updateReceipt()
+                            onNavigateUp("saved")
+                        },
+                        enabled = isReceiptValid && hasUnsavedChanges
+                    ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            painterResource(R.drawable.ic_save),
+                            contentDescription = "Save"
                         )
                     }
-                },
-                actions = {
-                    val currentReceipt = uiState
-                    if (currentReceipt != null) {
-                        val isReceiptValid = currentReceipt.date.isNotBlank() &&
-                                currentReceipt.amount > 0.0 &&
-                                currentReceipt.imageUri.isNotBlank()
-
-                        IconButton(onClick = {
-                            viewModel.updateReceipt()
-                            onNavigateUp()
-                            // TODO: Also disable unless changes have been made
-                        }, enabled = isReceiptValid) {
-                            Icon(
-                                painterResource(R.drawable.ic_save),
-                                contentDescription = "Save"
-                            )
-                        }
-                        IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete"
-                            )
-                        }
-                        if (showDeleteDialog) {
-                            DeleteAlertDialog(
-                                item = ItemToBeDeleted.Receipt,
-                                onDismiss = { showDeleteDialog = false },
-                                onConfirmDelete = {
-                                    viewModel.deleteReceipt(currentReceipt.tripId)
-                                    onNavigateUp()
-                                }
-                            )
-                        }
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete"
+                        )
+                    }
+                    if (showDeleteDialog) {
+                        DeleteAlertDialog(
+                            item = ItemToBeDeleted.Receipt,
+                            onDismiss = { showDeleteDialog = false },
+                            onConfirmDelete = {
+                                viewModel.deleteReceipt(receiptToDisplay.tripId)
+                                onNavigateUp("deleted")
+                            }
+                        )
                     }
                 }
-            )
-        },
+            }
+        )
+    }
     ) { innerPadding ->
         if (uiState == null) {
             Box(
