@@ -54,8 +54,10 @@ fun EditTripScreen(
     val draft by viewModel.draftTrip.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.startEditing()
+    LaunchedEffect(uiState.trip.tripId) {
+        if (uiState.trip.tripId > 0 && draft == null) {
+            viewModel.startEditing()
+        }
     }
     val tripToDisplay = draft ?: uiState.trip
     var showDeleteDialog by remember { mutableStateOf(false) }
