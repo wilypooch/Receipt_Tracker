@@ -39,7 +39,6 @@ class TripDetailsViewModel(
             val receiptsFromDbStream = repository.getAllReceiptsForTripStream(id)
 
             combine(tripFromDbStream, receiptsFromDbStream) { tripDb, receipts ->
-                val calculatedTotal = receipts.sumOf { it.amount }
                 TripDetailsUiState(
                     trip = tripDb, receipts = receipts
                 )
