@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
+import java.text.DecimalFormat
 
 @Composable
 fun TripList(
@@ -54,6 +55,7 @@ fun TripListCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dec = DecimalFormat("##,##0.00")
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -78,7 +80,7 @@ fun TripListCard(
                     Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
                 }
                 Column {
-                    Text(text = "${symbolFromCode(tripCurrencyCode)} $tripTotal", style = MaterialTheme.typography.labelMedium)
+                    Text(text = "${symbolFromCode(tripCurrencyCode)} ${dec.format(tripTotal)}", style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
