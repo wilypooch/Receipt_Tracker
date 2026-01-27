@@ -17,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Trip
 import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
+import java.text.DecimalFormat
 
 @Composable
 fun TripList(
@@ -37,6 +39,7 @@ fun TripList(
                 tripName = item.name,
                 tripStartDate = item.startDate,
                 tripTotal = item.totalAmount,
+                tripCurrencyCode = item.currencyCode,
                 onClick = { onTripClick(item.tripId) }
             )
         }
@@ -48,9 +51,11 @@ fun TripListCard(
     tripName: String,
     tripStartDate: String,
     tripTotal: Double,
+    tripCurrencyCode: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dec = DecimalFormat("##,##0.00")
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -75,8 +80,7 @@ fun TripListCard(
                     Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
                 }
                 Column {
-                    // TODO: Format currency
-                    Text(text = tripTotal.toString(), style = MaterialTheme.typography.labelMedium)
+                    Text(text = "${symbolFromCode(tripCurrencyCode)} ${dec.format(tripTotal)}", style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
@@ -89,9 +93,9 @@ fun TripListPreview() {
     ReceiptTrackerTheme {
         TripList(
             items = listOf(
-                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", 400.00),
-                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993", 20.00),
-                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", 4888.86)
+                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", "GBP", 400.00),
+                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993","GBP", 20.00),
+                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", "GBP", 4888.86)
             ), onTripClick = {}
         )
     }
@@ -101,6 +105,6 @@ fun TripListPreview() {
 @Composable
 fun TripListCardPreview() {
     ReceiptTrackerTheme {
-        TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, onClick = {})
+        TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, tripCurrencyCode = "GBP", onClick = {})
     }
 }

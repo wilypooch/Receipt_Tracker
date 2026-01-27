@@ -36,8 +36,8 @@ fun TripOverviewScreen(
     viewModel: TripDetailsViewModel,
     onNavigateUp: (String?) -> Unit,
     onEditTripClick: () -> Unit,
-    onAddReceiptClick: () -> Unit,
-    onNavigateToReceipt: (Int) -> Unit,
+    onAddReceiptClick: (String) -> Unit,
+    onNavigateToReceipt: (Int, String) -> Unit,
     snackbarMessage: String? = null,
     onSnackbarShown: () -> Unit = {},
 ) {
@@ -56,6 +56,7 @@ fun TripOverviewScreen(
         }
         onNavigateUp(null)
     }
+    val currencyCode = uiState.trip.currencyCode
     BackHandler(onBack = handleBackNavigation)
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -105,7 +106,7 @@ fun TripOverviewScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddReceiptClick) {
+            FloatingActionButton(onClick = { onAddReceiptClick(currencyCode) }) {
                 Icon(Icons.Filled.Add, "Add Receipt")
             }
         }
@@ -128,6 +129,7 @@ fun TripOverviewScreen(
             }
             ReceiptList(
                 items = uiState.receipts,
+                currencyCode = currencyCode,
                 onReceiptClick = onNavigateToReceipt,
                 modifier = Modifier.weight(1f)
             )

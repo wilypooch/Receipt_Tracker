@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.receipttracker.R
+import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
@@ -52,6 +53,7 @@ fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     tripStartDate: String,
     tripEndDate: String,
+    currencyCode: String,
     onNavigateUp: (String?) -> Unit,
 ) {
     val draft by viewModel.draftReceipt.collectAsState()
@@ -154,6 +156,7 @@ fun EditReceiptDataScreen(
                     receipt = uiState!!,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
+                    currencyCode = currencyCode,
                     onDateChange = viewModel::onDateChange,
                     onAmountChange = viewModel::onAmountChange,
                     onNotesChange = viewModel::onNotesChange,
@@ -169,6 +172,7 @@ fun EditReceiptDataContent(
     receipt: Receipt,
     tripStartDate: String,
     tripEndDate: String,
+    currencyCode: String,
     onDateChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
@@ -250,7 +254,7 @@ fun EditReceiptDataContent(
         }
         OutlinedTextField(
             value = amountText,
-            label = { Text("Receipt Amount") },
+            label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
             onValueChange = { newText ->
                 amountText = newText
                 val parsed = newText.toDoubleOrNull()

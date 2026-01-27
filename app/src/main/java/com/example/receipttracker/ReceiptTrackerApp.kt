@@ -14,10 +14,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.AddReceiptScreen
+import com.example.receipttracker.ui.EditReceiptDataScreen
 import com.example.receipttracker.ui.EditTripScreen
 import com.example.receipttracker.ui.HomeScreen
 import com.example.receipttracker.ui.HomeViewModel
-import com.example.receipttracker.ui.EditReceiptDataScreen
 import com.example.receipttracker.ui.ReceiptViewModel
 import com.example.receipttracker.ui.TripDetailsViewModel
 import com.example.receipttracker.ui.TripOverviewScreen
@@ -26,8 +26,13 @@ import java.util.UUID
 data object TripList
 data class TripOverview(val id: Int)
 data class EditTrip(val id: Int)
-data class AddReceipt(val tripId: Int)
-data class EditReceipt(val receiptId: Int, val tripStartDate: String, val tripEndDate: String)
+data class AddReceipt(val tripId: Int, val currencyCode: String)
+data class EditReceipt(
+    val receiptId: Int,
+    val tripStartDate: String,
+    val tripEndDate: String,
+    val currencyCode: String,
+)
 
 
 @Suppress("UNCHECKED_CAST")
@@ -93,14 +98,15 @@ fun ReceiptTrackerApp() {
                             }
                             backStack.removeLastOrNull()
                         },
-                        onAddReceiptClick = { backStack.add(AddReceipt(tripId)) },
+                        onAddReceiptClick = {currencyCode -> backStack.add(AddReceipt(tripId, currencyCode)) },
                         onEditTripClick = { backStack.add(EditTrip(tripId)) },
-                        onNavigateToReceipt = { receiptId ->
+                        onNavigateToReceipt = { receiptId, currencyCode ->
                             backStack.add(
                                 EditReceipt(
                                     receiptId,
                                     start,
-                                    endDate
+                                    endDate,
+                                    currencyCode
                                 )
                             )
                         },
@@ -146,6 +152,7 @@ fun ReceiptTrackerApp() {
 
                 is AddReceipt -> NavEntry(key) {
                     val tripId = key.tripId
+                    val currencyCode = key.currencyCode
                     val viewModel: TripDetailsViewModel = viewModel(
                         // Reusing Trip ViewModel
                         key = "TripDetailVM_$tripId",
@@ -153,6 +160,7 @@ fun ReceiptTrackerApp() {
                     )
                     AddReceiptScreen(
                         viewModel = viewModel,
+                        currencyCode = currencyCode,
                         onNavigateUp = { result ->
                             if (result == "saved") {
                                 snackbarMessage = "Receipt Saved"
@@ -166,6 +174,7 @@ fun ReceiptTrackerApp() {
                     val receiptId = key.receiptId
                     val tripStartDate = key.tripStartDate
                     val tripEndDate = key.tripEndDate
+                    val currencyCode = key.currencyCode
                     val viewModel: ReceiptViewModel = viewModel(
                         key = "ReceiptDetailVM_$receiptId",
                         factory = ReceiptViewModel.provideFactory(receiptId, repository)
@@ -174,6 +183,7 @@ fun ReceiptTrackerApp() {
                         viewModel = viewModel,
                         tripStartDate = tripStartDate,
                         tripEndDate = tripEndDate,
+                        currencyCode = currencyCode,
                         onNavigateUp = { backStack.removeLastOrNull() }
                     )
                 }

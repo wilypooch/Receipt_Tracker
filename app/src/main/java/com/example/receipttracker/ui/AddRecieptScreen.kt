@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.receipttracker.R
+import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
@@ -57,6 +58,7 @@ import java.util.TimeZone
 @Composable
 fun AddReceiptScreen(
     viewModel: TripDetailsViewModel,
+    currencyCode: String,
     onNavigateUp: (String?) -> Unit,
 ) {
     val context = LocalContext.current
@@ -254,7 +256,7 @@ fun AddReceiptScreen(
             OutlinedTextField(
                 value = amount,
                 onValueChange = { amount = it },
-                label = { Text("Amount") },
+                label = { Text("Amount (${symbolFromCode(currencyCode)})") },
                 isError = amount.isNotEmpty() && !isAmountValid,
                 supportingText = {
                     if (amount.isNotEmpty() && !isAmountValid) {

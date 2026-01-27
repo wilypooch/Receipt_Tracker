@@ -53,7 +53,9 @@ class TripDetailsViewModel(
         if (initialTripId == -1) {
             viewModelScope.launch {
                 val newId: Long = repository.insertTrip(Trip())
+                val newTrip = Trip(tripId = newId.toInt())
                 _currentTripId.value = newId.toInt()
+                _draftTrip.value = newTrip
             }
         }
     }
@@ -76,6 +78,10 @@ class TripDetailsViewModel(
 
     fun onEndDateChange(value: String) {
         _draftTrip.update { it?.copy(endDate = value) }
+    }
+
+    fun onCurrencyChange(value: String) {
+        _draftTrip.update { it?.copy(currencyCode = value) }
     }
 
     fun saveTrip() {
