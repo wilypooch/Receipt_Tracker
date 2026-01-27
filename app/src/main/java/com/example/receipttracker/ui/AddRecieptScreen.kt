@@ -42,7 +42,9 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.receipttracker.R
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
+import com.example.receipttracker.data.ReceiptType
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
+import com.example.receipttracker.ui.utils.ReceiptTypeDropdown
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 import com.example.receipttracker.ui.utils.copyUriToFile
@@ -63,6 +65,7 @@ fun AddReceiptScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    var receiptType by remember { mutableStateOf(ReceiptType.FoodAndDrink) }
     var amount by remember { mutableStateOf("") }
     val isAmountValid = amount.toDoubleOrNull() != null
     var notes by remember { mutableStateOf("") }
@@ -145,6 +148,7 @@ fun AddReceiptScreen(
                             viewModel.addReceipt(
                                 date = selectedDate,
                                 imagePath = currentPhotoPath!!,
+                                receiptType = receiptType.toString(),
                                 amount = amount.toDoubleOrNull() ?: 0.0,
                                 notes = notes
                             )
@@ -252,6 +256,11 @@ fun AddReceiptScreen(
                     }
                 ) { ReceiptDatePicker(state = datePickerState) }
             }
+
+            ReceiptTypeDropdown(
+                selectedReceiptType = receiptType,
+                onReceiptTypeSelected = { newType -> receiptType = newType })
+
 
             OutlinedTextField(
                 value = amount,
