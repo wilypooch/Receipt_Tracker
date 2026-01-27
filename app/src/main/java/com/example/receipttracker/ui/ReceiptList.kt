@@ -17,12 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Receipt
+import java.text.DecimalFormat
 
 @Composable
 fun ReceiptList(
     items: List<Receipt>,
-    onReceiptClick: (Int) -> Unit,
+    currencyCode: String,
+    onReceiptClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -33,11 +36,12 @@ fun ReceiptList(
         items(items) { receipt ->
             // TODO: Add swipe to delete functionality ?
             ReceiptListCard(
+                currencyCode = currencyCode,
                 receiptUri = receipt.imageUri,
                 receiptDate = receipt.date,
                 receiptAmount = receipt.amount,
                 receiptNotes = receipt.notes,
-                onClick = { onReceiptClick(receipt.receiptId) }
+                onClick = { onReceiptClick(receipt.receiptId, currencyCode) }
             )
         }
     }
@@ -46,6 +50,7 @@ fun ReceiptList(
 
 @Composable
 fun ReceiptListCard(
+    currencyCode: String,
     receiptUri: String,
     receiptDate: String,
     receiptAmount: Double,
@@ -53,12 +58,14 @@ fun ReceiptListCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currencySymbol = symbolFromCode(currencyCode)
+    val dec = DecimalFormat("##,##0.00")
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .clickable(
-                onClick = onClick
+                onClick = {onClick()}
             )
     ) {
         Row(modifier = modifier.padding(16.dp)) {
@@ -84,9 +91,8 @@ fun ReceiptListCard(
                         Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
                     }
                     Column {
-                        // TODO: Format currency
                         Text(
-                            text = receiptAmount.toString(),
+                            text = "$currencySymbol ${dec.format(receiptAmount)}",
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
