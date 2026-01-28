@@ -155,7 +155,7 @@ fun EditReceiptDataScreen(
                     .fillMaxSize()
             ) {
                 EditReceiptDataContent(
-                    receipt = uiState!!,
+                    receipt = receiptToDisplay!!,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
                     currencyCode = currencyCode,
