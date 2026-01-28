@@ -38,9 +38,11 @@ import coil.compose.AsyncImage
 import com.example.receipttracker.R
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Receipt
+import com.example.receipttracker.data.ReceiptType.Companion.receiptTypeFromString
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
+import com.example.receipttracker.ui.utils.ReceiptTypeDropdown
 import com.example.receipttracker.ui.utils.UnsavedChangesDialog
 import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
@@ -158,6 +160,7 @@ fun EditReceiptDataScreen(
                     tripEndDate = tripEndDate,
                     currencyCode = currencyCode,
                     onDateChange = viewModel::onDateChange,
+                    onReceiptTypeChange = viewModel::onReceiptTypeChange,
                     onAmountChange = viewModel::onAmountChange,
                     onNotesChange = viewModel::onNotesChange,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -174,6 +177,7 @@ fun EditReceiptDataContent(
     tripEndDate: String,
     currencyCode: String,
     onDateChange: (String) -> Unit,
+    onReceiptTypeChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
     modifier: Modifier,
@@ -252,6 +256,12 @@ fun EditReceiptDataContent(
                 }
             ) { ReceiptDatePicker(state = datePickerState) }
         }
+        ReceiptTypeDropdown(
+            selectedReceiptType = receiptTypeFromString(receipt.receiptType),
+            onReceiptTypeSelected = { newType ->
+                onReceiptTypeChange(newType.name)
+            }
+        )
         OutlinedTextField(
             value = amountText,
             label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
