@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Receipt
+import com.example.receipttracker.data.ReceiptType.Companion.displayNameFromType
 import java.text.DecimalFormat
 
 @Composable
@@ -39,6 +40,7 @@ fun ReceiptList(
                 currencyCode = currencyCode,
                 receiptUri = receipt.imageUri,
                 receiptDate = receipt.date,
+                receiptType = receipt.receiptType,
                 receiptAmount = receipt.amount,
                 receiptNotes = receipt.notes,
                 onClick = { onReceiptClick(receipt.receiptId, currencyCode) }
@@ -53,6 +55,7 @@ fun ReceiptListCard(
     currencyCode: String,
     receiptUri: String,
     receiptDate: String,
+    receiptType: String,
     receiptAmount: Double,
     receiptNotes: String,
     onClick: () -> Unit,
@@ -84,6 +87,14 @@ fun ReceiptListCard(
                     }
                     Column {
                         Text(text = receiptDate, style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                Row {
+                    Column(modifier.weight(2f)) {
+                        Text(text = "Type:", style = MaterialTheme.typography.labelMedium)
+                    }
+                    Column {
+                        Text(text = displayNameFromType(receiptType), style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 Row {
