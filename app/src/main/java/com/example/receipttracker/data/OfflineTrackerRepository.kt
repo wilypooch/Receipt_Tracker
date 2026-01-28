@@ -1,6 +1,5 @@
 package com.example.receipttracker.data
 
-import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 class OfflineTrackerRepository(private val tripDao: TripDao, private val receiptDao: ReceiptDao) :
@@ -44,7 +43,19 @@ class OfflineTrackerRepository(private val tripDao: TripDao, private val receipt
     override suspend fun getReceiptsForTripForDeletion(id: Int) =
         receiptDao.getReceiptsForTripForDeletion(id)
 
-    @Transaction
+    override suspend fun updateReceiptAndUpdateTripTotal(
+        updatedReceipt: Receipt,
+        oldAmount: Double,
+    ) {
+        receiptDao.update(updatedReceipt)
+        val trip = tripDao.getTripById(updatedReceipt.tripId)
+        trip?.let {
+            val difference = updatedReceipt.amount - oldAmount
+            val newTotal = it.totalAmount + difference
+            tripDao.update(it.copy(totalAmount = newTotal))
+        }
+    }
+
     override suspend fun deleteReceiptAndUpdateTripTotal(receiptId: Int, tripId: Int) {
         val receipt = getReceiptById(receiptId)
         if (receipt != null) {
