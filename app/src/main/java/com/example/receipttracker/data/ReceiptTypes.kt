@@ -1,7 +1,10 @@
 package com.example.receipttracker.data
 
 enum class ReceiptType(val displayName: String) {
+    AirFare("Air Fare"),
+    BusFare("Bus Fare"),
     CarHire("Car Hire"),
+    FerryCharges("Ferry Charges"),
     Flight("Flight"),
     FoodAndDrink("Food And Drink"),
     Fuel("Fuel"),
@@ -9,6 +12,8 @@ enum class ReceiptType(val displayName: String) {
     Parking("Parking"),
     Rail("Rail"),
     Taxi("Taxi"),
+    Tolls("Tolls"),
+    TubeUnderground("Tube / Underground"),
     Other("Other")
     ;
 
