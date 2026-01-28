@@ -65,7 +65,15 @@ class ReceiptViewModel(
 
     fun updateReceipt() {
         viewModelScope.launch {
-            _draftReceipt.value?.let { repository.updateReceipt(it) }
+            val originalReceipt = receiptState.value
+            val updatedReceipt = _draftReceipt.value
+            if (originalReceipt != null && updatedReceipt != null) {
+                repository.updateReceiptAndUpdateTripTotal(
+                    updatedReceipt = updatedReceipt,
+                    oldAmount = originalReceipt.amount
+                )
+                _draftReceipt.value = null
+            }
         }
     }
 
