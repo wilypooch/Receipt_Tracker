@@ -27,6 +27,8 @@ data class Receipt(
     val date: String = "",
     @ColumnInfo(name = "image_uri")
     val imageUri: String = "",
+    @ColumnInfo(name = "receipt_type")
+    val receiptType: String = "FoodAndDrink",
     @ColumnInfo(name = "amount")
     val amount: Double = 0.0,
     @ColumnInfo(name = "notes")

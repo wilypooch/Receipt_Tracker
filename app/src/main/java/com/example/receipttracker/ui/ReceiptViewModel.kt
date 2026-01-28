@@ -51,6 +51,10 @@ class ReceiptViewModel(
         _draftReceipt.update { it?.copy(date = newDate) }
     }
 
+    fun onReceiptTypeChange(newType: String) {
+        _draftReceipt.update { it?.copy(receiptType = newType) }
+    }
+
     fun onAmountChange(newAmount: Double) {
         _draftReceipt.update { it?.copy(amount = newAmount) }
     }

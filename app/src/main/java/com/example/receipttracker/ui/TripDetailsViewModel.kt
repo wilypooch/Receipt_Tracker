@@ -108,12 +108,19 @@ class TripDetailsViewModel(
         }
     }
 
-    fun addReceipt(date: String, imagePath: String, amount: Double, notes: String) {
+    fun addReceipt(
+        date: String,
+        imagePath: String,
+        receiptType: String,
+        amount: Double,
+        notes: String,
+    ) {
         viewModelScope.launch {
             val receipt = Receipt(
                 tripId = _currentTripId.value,
                 date = date,
                 imageUri = imagePath,
+                receiptType = receiptType,
                 amount = amount,
                 notes = notes
             )
