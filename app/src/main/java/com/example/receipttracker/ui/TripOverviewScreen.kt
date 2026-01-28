@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
@@ -112,7 +113,10 @@ fun TripOverviewScreen(
         }
     ) { innerPadding ->
         val numReceipts = uiState.receipts.size
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier.padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text(text = "${uiState.trip.startDate} - ${uiState.trip.endDate}")
             }
