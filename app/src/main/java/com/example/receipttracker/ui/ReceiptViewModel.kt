@@ -31,7 +31,6 @@ class ReceiptViewModel(
     init {
         viewModelScope.launch {
             receiptState.collect { dbReceipt ->
-                // Only initialize edits if user hasn't started editing yet
                 if (dbReceipt != null && _draftReceipt.value == null) {
                     _draftReceipt.value = dbReceipt
                 }
