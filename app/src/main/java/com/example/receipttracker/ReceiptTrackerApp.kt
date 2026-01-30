@@ -1,6 +1,7 @@
 package com.example.receipttracker
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -37,7 +38,7 @@ data class EditReceipt(
 
 @Suppress("UNCHECKED_CAST")
 @Composable
-fun ReceiptTrackerApp() {
+fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
     val backStack = remember { mutableStateListOf<Any>(TripList) }
     var snackbarMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -181,6 +182,7 @@ fun ReceiptTrackerApp() {
                     )
                     EditReceiptDataScreen(
                         viewModel = viewModel,
+                        windowSize = windowSize,
                         tripStartDate = tripStartDate,
                         tripEndDate = tripEndDate,
                         currencyCode = currencyCode,

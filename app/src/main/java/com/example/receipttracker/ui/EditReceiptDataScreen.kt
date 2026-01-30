@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +56,7 @@ import java.util.TimeZone
 @Composable
 fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
+    windowSize: WindowWidthSizeClass,
     tripStartDate: String,
     tripEndDate: String,
     currencyCode: String,
@@ -159,6 +161,7 @@ fun EditReceiptDataScreen(
                     .verticalScroll(scrollState)
             ) {
                 EditReceiptDataContent(
+                    windowSize = windowSize,
                     receipt = receiptToDisplay!!,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
@@ -177,6 +180,7 @@ fun EditReceiptDataScreen(
 @Composable
 fun EditReceiptDataContent(
     receipt: Receipt,
+    windowSize: WindowWidthSizeClass,
     tripStartDate: String,
     tripEndDate: String,
     currencyCode: String,
@@ -186,6 +190,8 @@ fun EditReceiptDataContent(
     onNotesChange: (String) -> Unit,
     modifier: Modifier,
 ) {
+    val isExpanded =
+        windowSize == WindowWidthSizeClass.Expanded || windowSize == WindowWidthSizeClass.Medium
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
     var showDatePicker by remember { mutableStateOf(false) }
     val tripStartMillis = convertDateStringToMillis(tripStartDate) ?: Long.MIN_VALUE
