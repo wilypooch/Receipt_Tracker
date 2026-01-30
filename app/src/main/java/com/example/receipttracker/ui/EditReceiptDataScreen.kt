@@ -3,6 +3,7 @@ package com.example.receipttracker.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -153,7 +154,6 @@ fun EditReceiptDataScreen(
                 CircularProgressIndicator()
             }
         } else {
-            // TODO: Add functionality to deal with different screen sizes
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -179,8 +179,8 @@ fun EditReceiptDataScreen(
 
 @Composable
 fun EditReceiptDataContent(
-    receipt: Receipt,
     windowSize: WindowWidthSizeClass,
+    receipt: Receipt,
     tripStartDate: String,
     tripEndDate: String,
     currencyCode: String,
@@ -192,10 +192,67 @@ fun EditReceiptDataContent(
 ) {
     val isExpanded =
         windowSize == WindowWidthSizeClass.Expanded || windowSize == WindowWidthSizeClass.Medium
+
+    val image = @Composable {
+        AsyncImage(
+            model = receipt.imageUri,
+            contentDescription = "Receipt Image",
+            modifier = Modifier
+                .height(400.dp)
+        )
+    }
+
+    val form = @Composable {
+        ReceiptFormFields(
+            receipt = receipt,
+            tripStartDate = tripStartDate,
+            tripEndDate = tripEndDate,
+            currencyCode = currencyCode,
+            onDateChange = onDateChange,
+            onReceiptTypeChange = onReceiptTypeChange,
+            onAmountChange = onAmountChange,
+            onNotesChange = onNotesChange
+        )
+    }
+
+    if (isExpanded) {
+        Row(
+            modifier = modifier.fillMaxSize(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(modifier = Modifier.weight(1.2f)) { image() }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)
+            ) { form() }
+        }
+    } else {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            image()
+            form()
+        }
+    }
+}
+
+@Composable
+private fun ReceiptFormFields(
+    receipt: Receipt,
+    tripStartDate: String,
+    tripEndDate: String,
+    currencyCode: String,
+    onDateChange: (String) -> Unit,
+    onReceiptTypeChange: (String) -> Unit,
+    onAmountChange: (Double) -> Unit,
+    onNotesChange: (String) -> Unit,
+) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
-    var showDatePicker by remember { mutableStateOf(false) }
     val tripStartMillis = convertDateStringToMillis(tripStartDate) ?: Long.MIN_VALUE
     val tripEndMillis = convertDateStringToMillis(tripEndDate) ?: Long.MAX_VALUE
+    var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = convertDateStringToMillis(receipt.date),
         selectableDates = object : SelectableDates {
@@ -213,81 +270,74 @@ fun EditReceiptDataContent(
             }
         }
     )
-    Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AsyncImage(
-            model = receipt.imageUri,
-            contentDescription = "Receipt Image",
-            modifier = Modifier
-                .height(400.dp)
-        )
-        OutlinedTextField(
-            value = receipt.date,
-            label = { Text("Receipt Date") },
-            readOnly = true,
-            onValueChange = { },
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(
-                        painterResource(R.drawable.ic_calendar_today),
-                        contentDescription = "Select Receipt Date"
-                    )
-                }
+
+    OutlinedTextField(
+        value = receipt.date,
+        label = { Text("Receipt Date") },
+        readOnly = true,
+        onValueChange = { },
+        trailingIcon = {
+            IconButton(onClick = { showDatePicker = true }) {
+                Icon(
+                    painterResource(R.drawable.ic_calendar_today),
+                    contentDescription = "Select Receipt Date"
+                )
+            }
+        },
+    )
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = {
+                datePickerState.selectedDateMillis = convertDateStringToMillis(receipt.date)
+                showDatePicker = false
             },
-        )
-        if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = {
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedDate = datePickerState.selectedDateMillis
+                        if (selectedDate != null) {
+                            onDateChange(convertMillisToDate(selectedDate))
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            }, dismissButton = {
+                TextButton(onClick = {
                     datePickerState.selectedDateMillis = convertDateStringToMillis(receipt.date)
                     showDatePicker = false
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            val selectedDate = datePickerState.selectedDateMillis
-                            if (selectedDate != null) {
-                                onDateChange(convertMillisToDate(selectedDate))
-                            }
-                            showDatePicker = false
-                        }
-                    ) {
-                        Text("OK")
-                    }
-                }, dismissButton = {
-                    TextButton(onClick = {
-                        datePickerState.selectedDateMillis = convertDateStringToMillis(receipt.date)
-                        showDatePicker = false
-                    }) {
-                        Text("Cancel")
-                    }
+                }) {
+                    Text("Cancel")
                 }
-            ) { ReceiptDatePicker(state = datePickerState) }
-        }
-        ReceiptTypeDropdown(
-            selectedReceiptType = receiptTypeFromString(receipt.receiptType),
-            onReceiptTypeSelected = { newType ->
-                onReceiptTypeChange(newType.name)
             }
-        )
-        OutlinedTextField(
-            value = amountText,
-            label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
-            onValueChange = { newText ->
-                amountText = newText
-                val parsed = newText.toDoubleOrNull()
-                if (parsed != null) {
-                    onAmountChange(parsed)
-                }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        )
-        OutlinedTextField(
-            value = receipt.notes,
-            label = { Text("Notes") },
-            onValueChange = onNotesChange
-        )
+        ) { ReceiptDatePicker(state = datePickerState) }
     }
+
+    ReceiptTypeDropdown(
+        selectedReceiptType = receiptTypeFromString(receipt.receiptType),
+        onReceiptTypeSelected = { newType ->
+            onReceiptTypeChange(newType.name)
+        }
+    )
+
+    OutlinedTextField(
+        value = amountText,
+        label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
+        onValueChange = { newText ->
+            amountText = newText
+            val parsed = newText.toDoubleOrNull()
+            if (parsed != null) {
+                onAmountChange(parsed)
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+    )
+
+    OutlinedTextField(
+        value = receipt.notes,
+        label = { Text("Notes") },
+        onValueChange = onNotesChange
+    )
 }
