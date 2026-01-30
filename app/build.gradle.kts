@@ -67,6 +67,9 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Window Size Class
+    implementation(libs.androidx.compose.material3.window.size.class1)
+
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
