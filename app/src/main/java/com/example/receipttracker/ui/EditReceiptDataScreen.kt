@@ -345,6 +345,7 @@ private fun ReceiptFormFields(
     OutlinedTextField(
         value = receipt.notes,
         label = { Text("Notes") },
+        placeholder = {Text("Optional")},
         onValueChange = onNotesChange
     )
 }

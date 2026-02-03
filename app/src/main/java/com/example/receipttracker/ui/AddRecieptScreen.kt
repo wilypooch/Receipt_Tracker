@@ -283,6 +283,7 @@ fun AddReceiptScreen(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
+                placeholder = {Text("Optional")},
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
