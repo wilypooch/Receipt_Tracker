@@ -336,6 +336,7 @@ private fun ReceiptFormFields(
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
     )
 
     OutlinedTextField(
