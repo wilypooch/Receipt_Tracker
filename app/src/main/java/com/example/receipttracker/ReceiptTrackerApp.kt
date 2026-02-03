@@ -7,8 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -66,13 +64,8 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
         entryProvider = entryProvider {
             entry<Route.TripList> { key ->
                 NavEntry(key) {
-                    // TODO: Abstract this ViewModel Factory implementation away from the NavDisplay
                     val homeViewModel: HomeViewModel = viewModel(
-                        factory = object : ViewModelProvider.Factory {
-                            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                                return HomeViewModel(application.container.trackerRepository) as T
-                            }
-                        }
+                        factory = HomeViewModel.provideFactory(repository)
                     )
                     HomeScreen(
                         viewModel = homeViewModel,

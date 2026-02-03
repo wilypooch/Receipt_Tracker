@@ -1,6 +1,7 @@
 package com.example.receipttracker.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.receipttracker.data.TrackerRepository
 import com.example.receipttracker.data.Trip
@@ -25,5 +26,15 @@ class HomeViewModel(
                 SharingStarted.WhileSubscribed(5_000),
                 HomeUiState()
             )
+
+    @Suppress("UNCHECKED_CAST")
+    companion object {
+        fun provideFactory(repository: TrackerRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return HomeViewModel(repository) as T
+                }
+            }
+    }
 }
 
