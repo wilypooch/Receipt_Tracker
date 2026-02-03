@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.AddReceiptScreen
@@ -62,10 +63,9 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
         backStack = backStack,
         // TODO: fix this onBack implementation as it is not currently used within the entry provider and code is duplicated.
         onBack = { backStack.removeLastOrNull() },
-        // TODO: Use Entry Provider DSL instead
-        entryProvider = { key ->
-            when (key) {
-                is Route.TripList -> NavEntry(key) {
+        entryProvider = entryProvider {
+            entry<Route.TripList> { key ->
+                NavEntry(key) {
                     // TODO: Abstract this ViewModel Factory implementation away from the NavDisplay
                     val homeViewModel: HomeViewModel = viewModel(
                         factory = object : ViewModelProvider.Factory {
@@ -88,8 +88,9 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         onSnackbarShown = { snackbarMessage = null }
                     )
                 }
-
-                is Route.TripOverview -> NavEntry(key) {
+            }
+            entry<Route.TripOverview> { key ->
+                NavEntry(key) {
                     val tripId = key.id
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
@@ -137,8 +138,9 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         onSnackbarShown = { snackbarMessage = null }
                     )
                 }
-
-                is Route.EditTrip -> NavEntry(key) {
+            }
+            entry<Route.EditTrip> { key ->
+                NavEntry(key) {
                     val tripId = key.id
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
@@ -172,8 +174,9 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         },
                     )
                 }
-
-                is Route.AddReceipt -> NavEntry(key) {
+            }
+            entry<Route.AddReceipt> { key ->
+                NavEntry(key) {
                     val tripId = key.tripId
                     val currencyCode = key.currencyCode
                     val viewModel: TripDetailsViewModel = viewModel(
@@ -192,8 +195,9 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         }
                     )
                 }
-
-                is Route.EditReceipt -> NavEntry(key) {
+            }
+            entry<Route.EditReceipt> { key ->
+                NavEntry(key) {
                     val receiptId = key.receiptId
                     val tripStartDate = key.tripStartDate
                     val tripEndDate = key.tripEndDate
@@ -211,8 +215,6 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         onNavigateUp = { backStack.removeLastOrNull() }
                     )
                 }
-
-                else -> error("Unknown NavKey: $key")
             }
         }
     )
