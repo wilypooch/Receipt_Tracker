@@ -272,7 +272,11 @@ fun AddReceiptScreen(
                         Text("Please enter a valid number")
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
             )
 
             OutlinedTextField(
