@@ -1,18 +1,18 @@
 package com.example.receipttracker
 
-import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.receipttracker.ui.AddReceiptScreen
 import com.example.receipttracker.ui.EditReceiptDataScreen
@@ -22,25 +22,39 @@ import com.example.receipttracker.ui.HomeViewModel
 import com.example.receipttracker.ui.ReceiptViewModel
 import com.example.receipttracker.ui.TripDetailsViewModel
 import com.example.receipttracker.ui.TripOverviewScreen
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
-data object TripList
-data class TripOverview(val id: Int)
-data class EditTrip(val id: Int)
-data class AddReceipt(val tripId: Int, val currencyCode: String)
-data class EditReceipt(
-    val receiptId: Int,
-    val tripStartDate: String,
-    val tripEndDate: String,
-    val currencyCode: String,
-)
+@Serializable
+sealed interface Route : NavKey {
+
+    @Serializable
+    data object TripList : Route, NavKey
+
+    @Serializable
+    data class TripOverview(val id: Int) : Route, NavKey
+
+    @Serializable
+    data class EditTrip(val id: Int) : Route, NavKey
+
+    @Serializable
+    data class AddReceipt(val tripId: Int, val currencyCode: String) : Route, NavKey
+
+    @Serializable
+    data class EditReceipt(
+        val receiptId: Int,
+        val tripStartDate: String,
+        val tripEndDate: String,
+        val currencyCode: String,
+    ) : Route, NavKey
+}
 
 
 @Suppress("UNCHECKED_CAST")
 @Composable
 fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
-    val backStack = remember { mutableStateListOf<Any>(TripList) }
-    var snackbarMessage by remember { mutableStateOf<String?>(null) }
+    val backStack = rememberNavBackStack(Route.TripList)
+    var snackbarMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val application = context.applicationContext as ReceiptTrackerApplication
     val repository = application.container.trackerRepository
@@ -48,9 +62,10 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
         backStack = backStack,
         // TODO: fix this onBack implementation as it is not currently used within the entry provider and code is duplicated.
         onBack = { backStack.removeLastOrNull() },
+        // TODO: Use Entry Provider DSL instead
         entryProvider = { key ->
             when (key) {
-                is TripList -> NavEntry(key) {
+                is Route.TripList -> NavEntry(key) {
                     // TODO: Abstract this ViewModel Factory implementation away from the NavDisplay
                     val homeViewModel: HomeViewModel = viewModel(
                         factory = object : ViewModelProvider.Factory {
@@ -63,18 +78,18 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                         viewModel = homeViewModel,
                         onViewTripClick = { selectedTripId ->
                             backStack.add(
-                                TripOverview(
+                                Route.TripOverview(
                                     selectedTripId
                                 )
                             )
                         },
-                        onAddTripClick = { backStack.add(EditTrip(-1)) },
+                        onAddTripClick = { backStack.add(Route.EditTrip(-1)) },
                         snackbarMessage = snackbarMessage,
                         onSnackbarShown = { snackbarMessage = null }
                     )
                 }
 
-                is TripOverview -> NavEntry(key) {
+                is Route.TripOverview -> NavEntry(key) {
                     val tripId = key.id
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
@@ -99,11 +114,18 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                             }
                             backStack.removeLastOrNull()
                         },
-                        onAddReceiptClick = {currencyCode -> backStack.add(AddReceipt(tripId, currencyCode)) },
-                        onEditTripClick = { backStack.add(EditTrip(tripId)) },
+                        onAddReceiptClick = { currencyCode ->
+                            backStack.add(
+                                Route.AddReceipt(
+                                    tripId,
+                                    currencyCode
+                                )
+                            )
+                        },
+                        onEditTripClick = { backStack.add(Route.EditTrip(tripId)) },
                         onNavigateToReceipt = { receiptId, currencyCode ->
                             backStack.add(
-                                EditReceipt(
+                                Route.EditReceipt(
                                     receiptId,
                                     start,
                                     endDate,
@@ -116,7 +138,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                     )
                 }
 
-                is EditTrip -> NavEntry(key) {
+                is Route.EditTrip -> NavEntry(key) {
                     val tripId = key.id
                     val viewModelKey = if (tripId == -1) {
                         "TripDetailVM_New_${UUID.randomUUID()}"
@@ -142,7 +164,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
 
                                 "deleted" -> {
                                     snackbarMessage = "Trip Deleted"
-                                    backStack.retainAll { it is TripList }
+                                    backStack.retainAll { it is Route.TripList }
                                 }
 
                                 else -> backStack.removeLastOrNull()
@@ -151,7 +173,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                     )
                 }
 
-                is AddReceipt -> NavEntry(key) {
+                is Route.AddReceipt -> NavEntry(key) {
                     val tripId = key.tripId
                     val currencyCode = key.currencyCode
                     val viewModel: TripDetailsViewModel = viewModel(
@@ -171,7 +193,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                     )
                 }
 
-                is EditReceipt -> NavEntry(key) {
+                is Route.EditReceipt -> NavEntry(key) {
                     val receiptId = key.receiptId
                     val tripStartDate = key.tripStartDate
                     val tripEndDate = key.tripEndDate
@@ -190,7 +212,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                     )
                 }
 
-                else -> NavEntry(Unit) { Text("Unknown Route") }
+                else -> error("Unknown NavKey: $key")
             }
         }
     )
