@@ -148,7 +148,6 @@ fun EditTripScreen(
 
         ) { innerPadding ->
         val scrollState = rememberScrollState()
-        // TODO: Add functionality to deal with different screen sizes
         Column(
             modifier = Modifier
                 .padding(innerPadding)
