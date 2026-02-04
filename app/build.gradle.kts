@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -66,6 +67,9 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Window Size Class
+    implementation(libs.androidx.compose.material3.window.size.class1)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)

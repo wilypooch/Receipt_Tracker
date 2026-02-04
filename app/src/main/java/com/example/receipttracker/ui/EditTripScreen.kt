@@ -147,11 +147,13 @@ fun EditTripScreen(
         },
 
         ) { innerPadding ->
-        // TODO: Add functionality to deal with screen rotation / different screen sizes
+        val scrollState = rememberScrollState()
+        // TODO: Add functionality to deal with different screen sizes
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .verticalScroll(scrollState)
         ) {
             TripDetailContent(
                 trip = tripToDisplay,
@@ -191,8 +193,7 @@ fun TripDetailContent(
 
     Column(
         modifier = modifier
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
