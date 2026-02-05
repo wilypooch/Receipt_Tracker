@@ -7,8 +7,8 @@ class OfflineTrackerRepository(private val tripDao: TripDao, private val receipt
     override fun getTripStream(id: Int): Flow<Trip?> =
         tripDao.getTrip(id)
 
-    override fun getAllTripsByDateAscStream(): Flow<List<Trip>> =
-        tripDao.getAllTripsByDateAsc()
+    override fun getAllTripsByDateDescStream(): Flow<List<Trip>> =
+        tripDao.getAllTripsByDateDesc()
 
     override suspend fun insertTrip(trip: Trip): Long =
         tripDao.insert(trip)
