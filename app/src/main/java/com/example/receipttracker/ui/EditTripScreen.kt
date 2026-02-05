@@ -31,18 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.R
 import com.example.receipttracker.data.AppCurrency.Companion.currencyFromCode
 import com.example.receipttracker.data.Trip
-import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
 import com.example.receipttracker.ui.utils.CurrencyDropdown
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.TripDateRangePicker
 import com.example.receipttracker.ui.utils.UnsavedChangesDialog
-import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,8 +107,8 @@ fun EditTripScreen(
                 },
                 actions = {
                     val isTripValid = tripToDisplay.name.isNotBlank() &&
-                            tripToDisplay.startDate.isNotBlank() &&
-                            tripToDisplay.endDate.isNotBlank()
+                            tripToDisplay.startDate > 0 &&
+                            tripToDisplay.endDate > 0
                     IconButton(
                         onClick = {
                             viewModel.saveTrip()
@@ -170,20 +167,16 @@ fun EditTripScreen(
 fun TripDetailContent(
     trip: Trip,
     onNameChange: (String) -> Unit,
-    onStartDateChange: (String) -> Unit,
-    onEndDateChange: (String) -> Unit,
+    onStartDateChange: (Long) -> Unit,
+    onEndDateChange: (Long) -> Unit,
     onCurrencyChange: (String) -> Unit,
     modifier: Modifier,
 ) {
     val datePickerState = rememberDateRangePickerState()
-    val startMillis = remember(trip.startDate) {
-        convertDateStringToMillis(trip.startDate)
-    }
-    val endMillis = remember(trip.endDate) {
-        convertDateStringToMillis(trip.endDate)
-    }
+    val startMillis = remember { trip.startDate }
+    val endMillis = remember { trip.endDate }
     LaunchedEffect(startMillis, endMillis) {
-        if (startMillis != null && endMillis != null) {
+        if (startMillis > 0 && endMillis > 0) {
             datePickerState.setSelection(startMillis, endMillis)
         }
     }
@@ -201,7 +194,7 @@ fun TripDetailContent(
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = trip.startDate,
+            value = convertMillisToDate(trip.startDate),
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -221,7 +214,7 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = trip.endDate,
+            value = convertMillisToDate(trip.endDate),
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
@@ -250,10 +243,10 @@ fun TripDetailContent(
                             val endMillis = datePickerState.selectedEndDateMillis
 
                             if (startMillis != null) {
-                                onStartDateChange(convertMillisToDate(startMillis))
+                                onStartDateChange(startMillis)
                             }
                             if (endMillis != null) {
-                                onEndDateChange(convertMillisToDate(endMillis))
+                                onEndDateChange(endMillis)
                             }
                             showDatePicker = false
                         }
@@ -273,6 +266,7 @@ fun TripDetailContent(
     }
 }
 
+/*
 @Preview(showBackground = true, name = "Existing Trip")
 @Composable
 fun TripDetailsContentPreview() {
@@ -309,4 +303,4 @@ fun TripDetailNewPreview() {
             modifier = Modifier,
         )
     }
-}
+}*/

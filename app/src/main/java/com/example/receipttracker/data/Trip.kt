@@ -12,9 +12,9 @@ data class Trip(
     @ColumnInfo(name = "name")
     val name: String = "",
     @ColumnInfo(name = "start_date")
-    val startDate: Long = System.currentTimeMillis(),
+    val startDate: Long = 0,
     @ColumnInfo(name = "end_date")
-    val endDate: Long = System.currentTimeMillis(),
+    val endDate: Long = 0,
     @ColumnInfo(name = "currency")
     val currencyCode: String = "GBP",
     @ColumnInfo(name = "total_amount")

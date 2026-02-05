@@ -60,8 +60,8 @@ import java.util.TimeZone
 fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     windowSize: WindowWidthSizeClass,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
     onNavigateUp: (String?) -> Unit,
 ) {
@@ -183,8 +183,8 @@ fun EditReceiptDataScreen(
 fun EditReceiptDataContent(
     windowSize: WindowWidthSizeClass,
     receipt: Receipt,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
     onDateChange: (String) -> Unit,
     onReceiptTypeChange: (String) -> Unit,
@@ -244,8 +244,8 @@ fun EditReceiptDataContent(
 @Composable
 private fun ReceiptFormFields(
     receipt: Receipt,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
     onDateChange: (String) -> Unit,
     onReceiptTypeChange: (String) -> Unit,
@@ -253,21 +253,19 @@ private fun ReceiptFormFields(
     onNotesChange: (String) -> Unit,
 ) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
-    val tripStartMillis = convertDateStringToMillis(tripStartDate) ?: Long.MIN_VALUE
-    val tripEndMillis = convertDateStringToMillis(tripEndDate) ?: Long.MAX_VALUE
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = convertDateStringToMillis(receipt.date),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis in tripStartMillis..tripEndMillis
+                return utcTimeMillis in tripStartDate..tripEndDate
             }
 
             override fun isSelectableYear(year: Int): Boolean {
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.timeInMillis = tripStartMillis
+                calendar.timeInMillis = tripStartDate
                 val startYear = calendar.get(Calendar.YEAR)
-                calendar.timeInMillis = tripEndMillis
+                calendar.timeInMillis = tripEndDate
                 val endYear = calendar.get(Calendar.YEAR)
                 return year in startYear..endYear
             }

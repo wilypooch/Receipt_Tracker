@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,10 +92,9 @@ fun AddReceiptScreen(
         }
     }
     var showDatePicker by remember { mutableStateOf(false) }
-    val tripStartMillis =
-        convertDateStringToMillis(viewModel.uiState.value.trip.startDate) ?: Long.MIN_VALUE
-    val tripEndMillis =
-        convertDateStringToMillis(viewModel.uiState.value.trip.endDate) ?: Long.MAX_VALUE
+    val uiState = viewModel.uiState.collectAsState()
+    val tripStartMillis = uiState.value.trip.startDate
+    val tripEndMillis = uiState.value.trip.endDate
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
     val dateToday = LocalDate.now().format(formatter)
 
@@ -283,7 +283,7 @@ fun AddReceiptScreen(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
-                placeholder = {Text("Optional")},
+                placeholder = { Text("Optional") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )

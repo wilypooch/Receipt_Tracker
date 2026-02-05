@@ -72,11 +72,11 @@ class TripDetailsViewModel(
         _draftTrip.update { it?.copy(name = value) }
     }
 
-    fun onStartDateChange(value: String) {
+    fun onStartDateChange(value: Long) {
         _draftTrip.update { it?.copy(startDate = value) }
     }
 
-    fun onEndDateChange(value: String) {
+    fun onEndDateChange(value: Long) {
         _draftTrip.update { it?.copy(endDate = value) }
     }
 

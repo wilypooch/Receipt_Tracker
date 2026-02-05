@@ -15,11 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Trip
-import com.example.receipttracker.ui.theme.ReceiptTrackerTheme
+import com.example.receipttracker.ui.utils.convertMillisToDate
 import java.text.DecimalFormat
 
 @Composable
@@ -49,7 +48,7 @@ fun TripList(
 @Composable
 fun TripListCard(
     tripName: String,
-    tripStartDate: String,
+    tripStartDate: Long,
     tripTotal: Double,
     tripCurrencyCode: String,
     onClick: () -> Unit,
@@ -72,7 +71,10 @@ fun TripListCard(
                     Text(text = "Start Date:", style = MaterialTheme.typography.labelMedium)
                 }
                 Column {
-                    Text(text = tripStartDate, style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        text = convertMillisToDate(tripStartDate),
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
             }
             Row {
@@ -80,13 +82,17 @@ fun TripListCard(
                     Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
                 }
                 Column {
-                    Text(text = "${symbolFromCode(tripCurrencyCode)} ${dec.format(tripTotal)}", style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        text = "${symbolFromCode(tripCurrencyCode)} ${dec.format(tripTotal)}",
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
             }
         }
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun TripListPreview() {
@@ -107,4 +113,4 @@ fun TripListCardPreview() {
     ReceiptTrackerTheme {
         TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, tripCurrencyCode = "GBP", onClick = {})
     }
-}
+}*/
