@@ -25,6 +25,6 @@ interface TripDao {
     @Query("SELECT * FROM trip WHERE trip_Id = :id")
     suspend fun getTripById(id: Int): Trip?
 
-    @Query("SELECT * FROM trip WHERE name != '' ORDER BY start_date ASC")
-    fun getAllTripsByDateAsc(): Flow<List<Trip>>
+    @Query("SELECT * FROM trip WHERE name != '' ORDER BY start_date DESC")
+    fun getAllTripsByDateDesc(): Flow<List<Trip>>
 }

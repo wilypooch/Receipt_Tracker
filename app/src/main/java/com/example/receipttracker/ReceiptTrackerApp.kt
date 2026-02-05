@@ -42,8 +42,8 @@ data class AddReceipt(val tripId: Int, val currencyCode: String) : Route
 @Serializable
 data class EditReceipt(
     val receiptId: Int,
-    val tripStartDate: String,
-    val tripEndDate: String,
+    val tripStartDate: Long,
+    val tripEndDate: Long,
     val currencyCode: String,
 ) : Route
 

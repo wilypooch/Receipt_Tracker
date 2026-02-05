@@ -19,7 +19,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> =
-        repository.getAllTripsByDateAscStream()
+        repository.getAllTripsByDateDescStream()
             .map { trips -> HomeUiState(trips = trips) }
             .stateIn(
                 viewModelScope,

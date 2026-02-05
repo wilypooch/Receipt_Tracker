@@ -20,6 +20,7 @@ import coil.compose.AsyncImage
 import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.Receipt
 import com.example.receipttracker.data.ReceiptType.Companion.displayNameFromType
+import com.example.receipttracker.ui.utils.convertMillisToDate
 import java.text.DecimalFormat
 
 @Composable
@@ -54,7 +55,7 @@ fun ReceiptList(
 fun ReceiptListCard(
     currencyCode: String,
     receiptUri: String,
-    receiptDate: String,
+    receiptDate: Long,
     receiptType: String,
     receiptAmount: Double,
     receiptNotes: String,
@@ -86,7 +87,7 @@ fun ReceiptListCard(
                         Text(text = "Receipt Date:", style = MaterialTheme.typography.labelMedium)
                     }
                     Column {
-                        Text(text = receiptDate, style = MaterialTheme.typography.labelMedium)
+                        Text(text = convertMillisToDate(receiptDate), style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 Row {

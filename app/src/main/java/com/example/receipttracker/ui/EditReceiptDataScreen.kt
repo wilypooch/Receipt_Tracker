@@ -50,7 +50,6 @@ import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
 import com.example.receipttracker.ui.utils.ReceiptTypeDropdown
 import com.example.receipttracker.ui.utils.UnsavedChangesDialog
-import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 import java.util.Calendar
 import java.util.TimeZone
@@ -60,8 +59,8 @@ import java.util.TimeZone
 fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     windowSize: WindowWidthSizeClass,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
     onNavigateUp: (String?) -> Unit,
 ) {
@@ -110,7 +109,7 @@ fun EditReceiptDataScreen(
             },
             actions = {
                 if (receiptToDisplay != null) {
-                    val isReceiptValid = receiptToDisplay.date.isNotBlank() &&
+                    val isReceiptValid = receiptToDisplay.date > 0 &&
                             receiptToDisplay.amount > 0.0 &&
                             receiptToDisplay.imageUri.isNotBlank()
 
@@ -183,10 +182,10 @@ fun EditReceiptDataScreen(
 fun EditReceiptDataContent(
     windowSize: WindowWidthSizeClass,
     receipt: Receipt,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
-    onDateChange: (String) -> Unit,
+    onDateChange: (Long) -> Unit,
     onReceiptTypeChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
@@ -244,30 +243,28 @@ fun EditReceiptDataContent(
 @Composable
 private fun ReceiptFormFields(
     receipt: Receipt,
-    tripStartDate: String,
-    tripEndDate: String,
+    tripStartDate: Long,
+    tripEndDate: Long,
     currencyCode: String,
-    onDateChange: (String) -> Unit,
+    onDateChange: (Long) -> Unit,
     onReceiptTypeChange: (String) -> Unit,
     onAmountChange: (Double) -> Unit,
     onNotesChange: (String) -> Unit,
 ) {
     var amountText by remember { mutableStateOf(receipt.amount.toString()) }
-    val tripStartMillis = convertDateStringToMillis(tripStartDate) ?: Long.MIN_VALUE
-    val tripEndMillis = convertDateStringToMillis(tripEndDate) ?: Long.MAX_VALUE
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateStringToMillis(receipt.date),
+        initialSelectedDateMillis = receipt.date,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis in tripStartMillis..tripEndMillis
+                return utcTimeMillis in tripStartDate..tripEndDate
             }
 
             override fun isSelectableYear(year: Int): Boolean {
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.timeInMillis = tripStartMillis
+                calendar.timeInMillis = tripStartDate
                 val startYear = calendar.get(Calendar.YEAR)
-                calendar.timeInMillis = tripEndMillis
+                calendar.timeInMillis = tripEndDate
                 val endYear = calendar.get(Calendar.YEAR)
                 return year in startYear..endYear
             }
@@ -275,7 +272,7 @@ private fun ReceiptFormFields(
     )
 
     OutlinedTextField(
-        value = receipt.date,
+        value = convertMillisToDate(receipt.date),
         label = { Text("Receipt Date") },
         readOnly = true,
         onValueChange = { },
@@ -292,7 +289,7 @@ private fun ReceiptFormFields(
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = {
-                datePickerState.selectedDateMillis = convertDateStringToMillis(receipt.date)
+                datePickerState.selectedDateMillis = receipt.date
                 showDatePicker = false
             },
             confirmButton = {
@@ -300,7 +297,7 @@ private fun ReceiptFormFields(
                     onClick = {
                         val selectedDate = datePickerState.selectedDateMillis
                         if (selectedDate != null) {
-                            onDateChange(convertMillisToDate(selectedDate))
+                            onDateChange(selectedDate)
                         }
                         showDatePicker = false
                     }
@@ -309,7 +306,7 @@ private fun ReceiptFormFields(
                 }
             }, dismissButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis = convertDateStringToMillis(receipt.date)
+                    datePickerState.selectedDateMillis = receipt.date
                     showDatePicker = false
                 }) {
                     Text("Cancel")
@@ -345,7 +342,7 @@ private fun ReceiptFormFields(
     OutlinedTextField(
         value = receipt.notes,
         label = { Text("Notes") },
-        placeholder = {Text("Optional")},
+        placeholder = { Text("Optional") },
         onValueChange = onNotesChange
     )
 }

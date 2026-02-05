@@ -46,7 +46,7 @@ class ReceiptViewModel(
         _draftReceipt.value = null
     }
 
-    fun onDateChange(newDate: String) {
+    fun onDateChange(newDate: Long) {
         _draftReceipt.update { it?.copy(date = newDate) }
     }
 

@@ -26,7 +26,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,15 +47,11 @@ import com.example.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import com.example.receipttracker.data.ReceiptType
 import com.example.receipttracker.ui.utils.ReceiptDatePicker
 import com.example.receipttracker.ui.utils.ReceiptTypeDropdown
-import com.example.receipttracker.ui.utils.convertDateStringToMillis
 import com.example.receipttracker.ui.utils.convertMillisToDate
 import com.example.receipttracker.ui.utils.copyUriToFile
 import com.example.receipttracker.ui.utils.createImageFile
 import java.io.File
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,25 +89,18 @@ fun AddReceiptScreen(
         }
     }
     var showDatePicker by remember { mutableStateOf(false) }
-    val tripStartMillis =
-        convertDateStringToMillis(viewModel.uiState.value.trip.startDate) ?: Long.MIN_VALUE
-    val tripEndMillis =
-        convertDateStringToMillis(viewModel.uiState.value.trip.endDate) ?: Long.MAX_VALUE
-    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
-    val dateToday = LocalDate.now().format(formatter)
+    val uiState by viewModel.uiState.collectAsState()
+    val tripStartMillis = uiState.trip.startDate
+    val tripEndMillis = uiState.trip.endDate
 
-    val initialDate = remember {
-        val todayMillis = convertDateStringToMillis(dateToday) ?: 0L
-        if (todayMillis in tripStartMillis..tripEndMillis) {
-            dateToday
-        } else {
-            ""
-        }
+    var selectedDate by remember {
+        val today = System.currentTimeMillis()
+        val initial = if (today in tripStartMillis..tripEndMillis) today else tripStartMillis
+        mutableLongStateOf(initial)
     }
-    var selectedDate by remember { mutableStateOf(initialDate) }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateStringToMillis(selectedDate),
+        initialSelectedDateMillis = selectedDate,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis in tripStartMillis..tripEndMillis
@@ -154,7 +145,7 @@ fun AddReceiptScreen(
                             )
                             onNavigateUp("saved")
                         },
-                        enabled = capturedImageUri != null && selectedDate != "" && isAmountValid,
+                        enabled = capturedImageUri != null && isAmountValid,
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_save),
@@ -208,7 +199,7 @@ fun AddReceiptScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = selectedDate,
+                value = convertMillisToDate(selectedDate),
                 label = { Text("Receipt Date") },
                 readOnly = true,
                 onValueChange = { },
@@ -230,15 +221,14 @@ fun AddReceiptScreen(
             if (showDatePicker) {
                 DatePickerDialog(
                     onDismissRequest = {
-                        datePickerState.selectedDateMillis =
-                            convertDateStringToMillis(selectedDate)
+                        datePickerState.selectedDateMillis = selectedDate
                         showDatePicker = false
                     },
                     confirmButton = {
                         TextButton(
                             onClick = {
                                 datePickerState.selectedDateMillis?.let { millis ->
-                                    selectedDate = convertMillisToDate(millis)
+                                    selectedDate = millis
                                 }
                                 showDatePicker = false
                             }
@@ -248,7 +238,7 @@ fun AddReceiptScreen(
                     }, dismissButton = {
                         TextButton(onClick = {
                             datePickerState.selectedDateMillis =
-                                convertDateStringToMillis(selectedDate)
+                                selectedDate
                             showDatePicker = false
                         }) {
                             Text("Cancel")
@@ -283,7 +273,7 @@ fun AddReceiptScreen(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
-                placeholder = {Text("Optional")},
+                placeholder = { Text("Optional") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
