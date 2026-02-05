@@ -194,7 +194,9 @@ fun TripDetailContent(
             onValueChange = onNameChange,
         )
         OutlinedTextField(
-            value = convertMillisToDate(trip.startDate),
+            value = if (trip.startDate == 0L) {
+                ""
+            } else convertMillisToDate(trip.startDate),
             label = { Text("Start Date") },
             onValueChange = { },
             readOnly = true,
@@ -214,7 +216,9 @@ fun TripDetailContent(
             }
         )
         OutlinedTextField(
-            value = convertMillisToDate(trip.endDate),
+            value = if (trip.endDate == 0L) {
+                ""
+            } else convertMillisToDate(trip.endDate),
             label = { Text("End Date") },
             onValueChange = { },
             readOnly = true,
