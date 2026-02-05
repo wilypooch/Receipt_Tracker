@@ -109,7 +109,7 @@ class TripDetailsViewModel(
     }
 
     fun addReceipt(
-        date: String,
+        date: Long,
         imagePath: String,
         receiptType: String,
         amount: Double,

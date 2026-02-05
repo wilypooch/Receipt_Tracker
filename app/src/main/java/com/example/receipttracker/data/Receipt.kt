@@ -24,7 +24,7 @@ data class Receipt(
     @ColumnInfo(name = "trip_id")
     val tripId: Int = 0,
     @ColumnInfo(name = "date")
-    val date: String = "",
+    val date: Long = 0,
     @ColumnInfo(name = "image_uri")
     val imageUri: String = "",
     @ColumnInfo(name = "receipt_type")
