@@ -122,15 +122,9 @@ fun TripOverviewScreen(
                 Text(text = "${convertMillisToDate(uiState.trip.startDate)} - ${convertMillisToDate(uiState.trip.endDate)}")
             }
             Row(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
-                if (numReceipts != 1) {
-                    Text(
-                        text = "$numReceipts receipts"
-                    )
-                } else {
-                    Text(
-                        text = "$numReceipts receipt"
-                    )
-                }
+                Text(
+                    text = if (numReceipts != 1) "$numReceipts receipts" else "$numReceipts receipt"
+                )
             }
             ReceiptList(
                 items = uiState.receipts,
@@ -140,5 +134,4 @@ fun TripOverviewScreen(
             )
         }
     }
-
 }
