@@ -33,7 +33,6 @@ fun TripList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            // TODO: Add swipe to delete functionality ?
             TripListCard(
                 tripName = item.name,
                 tripStartDate = item.startDate,

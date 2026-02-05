@@ -36,7 +36,6 @@ fun ReceiptList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { receipt ->
-            // TODO: Add swipe to delete functionality ?
             ReceiptListCard(
                 currencyCode = currencyCode,
                 receiptUri = receipt.imageUri,
