@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
+import com.example.receipttracker.ui.utils.convertMillisToDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +119,7 @@ fun TripOverviewScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.padding(horizontal = 8.dp)) {
-                Text(text = "${uiState.trip.startDate} - ${uiState.trip.endDate}")
+                Text(text = "${convertMillisToDate(uiState.trip.startDate)} - ${convertMillisToDate(uiState.trip.endDate)}")
             }
             Row(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
                 if (numReceipts != 1) {
