@@ -22,6 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -33,9 +35,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,6 +55,8 @@ import com.example.receipttracker.ui.utils.ReceiptDatePicker
 import com.example.receipttracker.ui.utils.ReceiptTypeDropdown
 import com.example.receipttracker.ui.utils.UnsavedChangesDialog
 import com.example.receipttracker.ui.utils.convertMillisToDate
+import com.example.receipttracker.ui.utils.exportReceiptToGallery
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -59,15 +65,26 @@ import java.util.TimeZone
 fun EditReceiptDataScreen(
     viewModel: ReceiptViewModel,
     windowSize: WindowWidthSizeClass,
+    tripName: String,
     tripStartDate: Long,
     tripEndDate: Long,
     currencyCode: String,
     onNavigateUp: (String?) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    var snackbarMessage by remember { mutableStateOf<String?>(null) }
     val draft by viewModel.draftReceipt.collectAsState()
     val uiState by viewModel.receiptState.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.startEditing()
+    }
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(message = message)
+            snackbarMessage = null
+        }
     }
     val receiptToDisplay = draft ?: uiState
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -94,57 +111,75 @@ fun EditReceiptDataScreen(
             },
             onDismiss = { showUnsavedDialog = false })
     }
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text("Receipt Details") },
-            navigationIcon = {
-                IconButton(onClick = {
-                    handleBackNavigation()
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            },
-            actions = {
-                if (receiptToDisplay != null) {
-                    val isReceiptValid = receiptToDisplay.date > 0 &&
-                            receiptToDisplay.amount > 0.0 &&
-                            receiptToDisplay.imageUri.isNotBlank()
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Receipt Details") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        handleBackNavigation()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            val success = exportReceiptToGallery(
+                                context = context,
+                                filePath = receiptToDisplay?.imageUri ?: "",
+                                fileName = "Trip_${tripName}_Receipt_${receiptToDisplay?.receiptId}"
+                            )
+                            snackbarMessage =
+                                if (success) "Receipt Exported" else "Receipt Export Failed"
+                        }
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.ic_download),
+                            contentDescription = "Download Receipt Photo"
+                        )
+                    }
+                    if (receiptToDisplay != null) {
+                        val isReceiptValid = receiptToDisplay.date > 0 &&
+                                receiptToDisplay.amount > 0.0 &&
+                                receiptToDisplay.imageUri.isNotBlank()
 
-                    IconButton(
-                        onClick = {
-                            viewModel.updateReceipt()
-                            onNavigateUp("saved")
-                        },
-                        enabled = isReceiptValid && hasUnsavedChanges
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.ic_save),
-                            contentDescription = "Save"
-                        )
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                    if (showDeleteDialog) {
-                        DeleteAlertDialog(
-                            item = ItemToBeDeleted.Receipt,
-                            onDismiss = { showDeleteDialog = false },
-                            onConfirmDelete = {
-                                viewModel.deleteReceipt(receiptToDisplay.tripId)
-                                onNavigateUp("deleted")
-                            }
-                        )
+                        IconButton(
+                            onClick = {
+                                viewModel.updateReceipt()
+                                onNavigateUp("saved")
+                            },
+                            enabled = isReceiptValid && hasUnsavedChanges
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_save),
+                                contentDescription = "Save"
+                            )
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                        if (showDeleteDialog) {
+                            DeleteAlertDialog(
+                                item = ItemToBeDeleted.Receipt,
+                                onDismiss = { showDeleteDialog = false },
+                                onConfirmDelete = {
+                                    viewModel.deleteReceipt(receiptToDisplay.tripId)
+                                    onNavigateUp("deleted")
+                                }
+                            )
+                        }
                     }
                 }
-            }
-        )
-    }
+            )
+        }
     ) { innerPadding ->
         val scrollState = rememberScrollState()
         if (uiState == null) {
