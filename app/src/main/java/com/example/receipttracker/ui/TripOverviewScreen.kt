@@ -53,7 +53,7 @@ fun TripOverviewScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var exportMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(snackbarMessage) {
+    LaunchedEffect(snackbarMessage, exportMessage) {
         snackbarMessage?.let {
             snackbarHostState.showSnackbar(it)
             onSnackbarShown()
