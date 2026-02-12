@@ -359,7 +359,8 @@ private fun ReceiptFormFields(
 
     OutlinedTextField(
         value = amountText,
-        label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
+        label = { Text("Receipt Amount") },
+        prefix = {Text(symbolFromCode(currencyCode))},
         onValueChange = { newText ->
             amountText = newText
             val parsed = newText.toDoubleOrNull()
