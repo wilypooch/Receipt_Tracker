@@ -1,6 +1,5 @@
 package com.example.receipttracker.ui.utils
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -37,7 +36,6 @@ fun ReceiptTypeDropdown(
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
-                .fillMaxWidth()
         )
 
         ExposedDropdownMenu(

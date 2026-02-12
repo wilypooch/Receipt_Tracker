@@ -7,6 +7,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
@@ -156,7 +158,12 @@ fun AddReceiptScreen(
             )
         },
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             // Show preview if photo taken
             if (capturedImageUri != null) {
                 AsyncImage(
@@ -179,8 +186,7 @@ fun AddReceiptScreen(
                             )
                             cameraLauncher.launch(photoUri)
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    }
                 ) {
                     Text("Take Photo of Receipt")
                 }
@@ -189,7 +195,7 @@ fun AddReceiptScreen(
                         galleryLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
-                    }, modifier = Modifier.fillMaxWidth()
+                    }
                 ) {
                     Text("Select from Gallery")
                 }
@@ -274,8 +280,7 @@ fun AddReceiptScreen(
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
                 placeholder = { Text("Optional") },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
         }
     }

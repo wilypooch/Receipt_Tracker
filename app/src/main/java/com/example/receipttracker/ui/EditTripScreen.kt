@@ -149,7 +149,8 @@ fun EditTripScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TripDetailContent(
                 trip = tripToDisplay,
