@@ -42,6 +42,7 @@ data class AddReceipt(val tripId: Int, val currencyCode: String) : Route
 @Serializable
 data class EditReceipt(
     val receiptId: Int,
+    val tripName: String,
     val tripStartDate: Long,
     val tripEndDate: Long,
     val currencyCode: String,
@@ -116,7 +117,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                     onNavigateToReceipt = { receiptId, currencyCode ->
                         backStack.add(
                             EditReceipt(
-                                receiptId,
+                                receiptId, uiState.trip.name,
                                 uiState.trip.startDate,
                                 uiState.trip.endDate,
                                 currencyCode
@@ -183,6 +184,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
             }
             entry<EditReceipt> { key ->
                 val receiptId = key.receiptId
+                val tripName = key.tripName
                 val tripStartDate = key.tripStartDate
                 val tripEndDate = key.tripEndDate
                 val currencyCode = key.currencyCode
@@ -193,6 +195,7 @@ fun ReceiptTrackerApp(windowSize: WindowWidthSizeClass) {
                 EditReceiptDataScreen(
                     viewModel = viewModel,
                     windowSize = windowSize,
+                    tripName = tripName,
                     tripStartDate = tripStartDate,
                     tripEndDate = tripEndDate,
                     currencyCode = currencyCode,

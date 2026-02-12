@@ -24,13 +24,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.receipttracker.R
 import com.example.receipttracker.ui.utils.DeleteAlertDialog
 import com.example.receipttracker.ui.utils.ItemToBeDeleted
 import com.example.receipttracker.ui.utils.convertMillisToDate
+import com.example.receipttracker.ui.utils.exportReceiptToGallery
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,11 +49,18 @@ fun TripOverviewScreen(
     snackbarMessage: String? = null,
     onSnackbarShown: () -> Unit = {},
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(snackbarMessage) {
+    var exportMessage by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(snackbarMessage, exportMessage) {
         snackbarMessage?.let {
             snackbarHostState.showSnackbar(it)
             onSnackbarShown()
+        }
+        exportMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            exportMessage = null
         }
     }
     val uiState by viewModel.uiState.collectAsState()
@@ -76,6 +89,32 @@ fun TripOverviewScreen(
                     }
                 },
                 actions = {
+                    if (uiState.receipts.isNotEmpty()) {
+                        IconButton(onClick = {
+                            scope.launch {
+                                var successCount = 0
+                                uiState.receipts.forEach { receipt ->
+                                    val success = exportReceiptToGallery(
+                                        context = context,
+                                        filePath = receipt.imageUri,
+                                        fileName = "Trip_${uiState.trip.name}_Receipt_${receipt.receiptId}"
+                                    )
+                                    if (success) successCount++
+                                }
+                                val message = if (successCount == uiState.receipts.size) {
+                                    "Exported all receipts for this trip to gallery"
+                                } else {
+                                    "Exported $successCount of ${uiState.receipts.size} receipts"
+                                }
+                                exportMessage = message
+                            }
+                        }) {
+                            Icon(
+                                painterResource(R.drawable.ic_download),
+                                contentDescription = "Download All Receipt Photos"
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = {
                             onEditTripClick()
@@ -122,15 +161,9 @@ fun TripOverviewScreen(
                 Text(text = "${convertMillisToDate(uiState.trip.startDate)} - ${convertMillisToDate(uiState.trip.endDate)}")
             }
             Row(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
-                if (numReceipts != 1) {
-                    Text(
-                        text = "$numReceipts receipts"
-                    )
-                } else {
-                    Text(
-                        text = "$numReceipts receipt"
-                    )
-                }
+                Text(
+                    text = if (numReceipts != 1) "$numReceipts receipts" else "$numReceipts receipt"
+                )
             }
             ReceiptList(
                 items = uiState.receipts,
@@ -140,5 +173,4 @@ fun TripOverviewScreen(
             )
         }
     }
-
 }
