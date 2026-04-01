@@ -25,15 +25,15 @@ class TripDaoTest {
 
     private var trip1 = Trip(
         name = "Defcon",
-        startDate = "05/08/2025",
-        endDate = "12/08/2025",
+        startDate = 1711965600000,
+        endDate = 1711965600000,
         totalAmount = 300.00
     )
 
     private var trip2 = Trip(
         name = "SANS",
-        startDate = "13/05/2025",
-        endDate = "20/05/2025",
+        startDate = 1711965600000,
+        endDate = 1711965600000,
         totalAmount = 400.00
     )
 
@@ -55,7 +55,7 @@ class TripDaoTest {
     @Throws(Exception::class)
     fun insertTrip_AddsTripToDb() = runBlocking {
         tripDao.insert(trip1)
-        val allTrips = tripDao.getAllTripsByDateAsc().first()
+        val allTrips = tripDao.getAllTripsByDateDesc().first()
         assertEquals("Defcon", allTrips[0].name)
     }
 
@@ -64,12 +64,12 @@ class TripDaoTest {
     fun getTrip_RetrievesCorrectTripById() = runBlocking {
         tripDao.insert(trip1)
         tripDao.insert(trip2)
-        val allTrips = tripDao.getAllTripsByDateAsc().first()
+        val allTrips = tripDao.getAllTripsByDateDesc().first()
         val idToFind = allTrips.first { it.name == "SANS" }.tripId
         val loadedTrip = tripDao.getTrip(idToFind).filterNotNull().first()
         assertEquals(2, allTrips.size)
         assertEquals("SANS", loadedTrip.name)
-        assertEquals("13/05/2025", loadedTrip.startDate)
+        assertEquals(1711965600000, loadedTrip.startDate)
         assertEquals(idToFind, loadedTrip.tripId)
     }
 
@@ -77,11 +77,11 @@ class TripDaoTest {
     @Throws(Exception::class)
     fun deleteTrip_RemovesItemFromDb() = runBlocking {
         tripDao.insert(trip2)
-        var allTrips = tripDao.getAllTripsByDateAsc().first()
+        var allTrips = tripDao.getAllTripsByDateDesc().first()
         assertEquals(1, allTrips.size)
         val tripToDelete = allTrips[0]
-        tripDao.delete(tripToDelete)
-        allTrips = tripDao.getAllTripsByDateAsc().first()
+        tripDao.deleteById(tripToDelete.tripId)
+        allTrips = tripDao.getAllTripsByDateDesc().first()
         assertTrue(allTrips.isEmpty())
     }
 
@@ -89,11 +89,11 @@ class TripDaoTest {
     @Throws(Exception::class)
     fun updateTrip_UpdatesValuesInDb() = runBlocking {
         tripDao.insert(trip1)
-        val savedTrip = tripDao.getAllTripsByDateAsc().first()[0]
+        val savedTrip = tripDao.getAllTripsByDateDesc().first()[0]
         val modifiedTrip = savedTrip.copy(name = "Cancelled")
         tripDao.update(modifiedTrip)
         val loadedTrip = tripDao.getTrip(savedTrip.tripId).filterNotNull().first()
         assertEquals("Cancelled", loadedTrip.name)
-        assertEquals("05/08/2025", loadedTrip.startDate)
+        assertEquals(1711965600000, loadedTrip.startDate)
     }
 }
