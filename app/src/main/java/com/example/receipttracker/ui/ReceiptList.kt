@@ -81,6 +81,9 @@ fun ReceiptListCard(
                 )
             }
             Column {
+                    .weight(0.4f),
+
+            Column(modifier = Modifier.weight(0.6f)) {
                 Row {
                     Column(modifier.weight(2f)) {
                         Text(text = "Receipt Date:", style = MaterialTheme.typography.labelMedium)
