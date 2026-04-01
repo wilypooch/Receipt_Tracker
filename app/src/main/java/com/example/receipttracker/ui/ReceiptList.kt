@@ -68,7 +68,7 @@ fun ReceiptListCard(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .clickable(
-                onClick = {onClick()}
+                onClick = { onClick() }
             )
     ) {
         Row(modifier = modifier.padding(16.dp)) {
@@ -86,7 +86,10 @@ fun ReceiptListCard(
                         Text(text = "Receipt Date:", style = MaterialTheme.typography.labelMedium)
                     }
                     Column {
-                        Text(text = convertMillisToDate(receiptDate), style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = convertMillisToDate(receiptDate),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                 }
                 Row {
@@ -94,7 +97,10 @@ fun ReceiptListCard(
                         Text(text = "Type:", style = MaterialTheme.typography.labelMedium)
                     }
                     Column {
-                        Text(text = displayNameFromType(receiptType), style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = displayNameFromType(receiptType),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                 }
                 Row {
