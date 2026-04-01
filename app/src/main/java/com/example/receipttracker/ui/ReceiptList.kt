@@ -71,19 +71,17 @@ fun ReceiptListCard(
                 onClick = { onClick() }
             )
     ) {
-        Row(modifier = modifier.padding(16.dp)) {
-            Column {
-                AsyncImage(
-                    model = receiptUri,
-                    contentDescription = "Receipt Preview",
-                    modifier = Modifier
-                        .height(200.dp)
-                )
-            }
-            Column {
+        Row(
             modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AsyncImage(
+                model = receiptUri,
+                contentDescription = "Receipt Preview",
+                modifier = Modifier
+                    .height(150.dp)
                     .weight(0.4f),
+            )
 
             Column(modifier = Modifier.weight(0.6f)) {
                 Row {
