@@ -84,42 +84,16 @@ fun ReceiptListCard(
             )
 
             Column(modifier = Modifier.weight(0.6f)) {
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Receipt Date:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(
-                            text = convertMillisToDate(receiptDate),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Type:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(
-                            text = displayNameFromType(receiptType),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(
-                            text = "$currencySymbol ${dec.format(receiptAmount)}",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
-                Row { Text(text = "Notes:", style = MaterialTheme.typography.labelMedium) }
-                Row {
-                    Text(text = receiptNotes, style = MaterialTheme.typography.labelMedium)
+                Text(
+                    text = "${convertMillisToDate(receiptDate)} • ${displayNameFromType(receiptType)}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = "$currencySymbol${dec.format(receiptAmount)}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                if (receiptNotes.isNotEmpty()) {
+                    Text(text = receiptNotes, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
