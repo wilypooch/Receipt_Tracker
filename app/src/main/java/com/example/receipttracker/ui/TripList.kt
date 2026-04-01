@@ -62,28 +62,28 @@ fun TripListCard(
     ) {
         Column(modifier = modifier.padding(16.dp)) {
             Row {
-                Text(tripName, style = MaterialTheme.typography.titleLarge)
+                Text(tripName, style = MaterialTheme.typography.headlineMedium)
             }
             Spacer(modifier.height(8.dp))
             Row {
                 Column(modifier.weight(2f)) {
-                    Text(text = "Start Date:", style = MaterialTheme.typography.labelMedium)
+                    Text(text = "Start Date:", style = MaterialTheme.typography.labelLarge)
                 }
                 Column {
                     Text(
                         text = convertMillisToDate(tripStartDate),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
             Row {
                 Column(modifier.weight(2f)) {
-                    Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
+                    Text(text = "Total:", style = MaterialTheme.typography.labelLarge)
                 }
                 Column {
                     Text(
                         text = "${symbolFromCode(tripCurrencyCode)}${dec.format(tripTotal)}",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
