@@ -108,13 +108,9 @@ fun ReceiptListCard(
                         )
                     }
                 }
+                Row { Text(text = "Notes:", style = MaterialTheme.typography.labelMedium) }
                 Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Notes:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(text = receiptNotes, style = MaterialTheme.typography.labelMedium)
-                    }
+                    Text(text = receiptNotes, style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
