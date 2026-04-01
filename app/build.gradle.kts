@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.receipttracker"
+    namespace = "uk.wilypooch.receipttracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.receipttracker"
+        applicationId = "uk.wilypooch.receipttracker"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
