@@ -4,8 +4,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -270,6 +272,7 @@ fun EditReceiptDataContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             image()
+            Spacer(Modifier.height(8.dp))
             form()
         }
     }
@@ -359,7 +362,8 @@ private fun ReceiptFormFields(
 
     OutlinedTextField(
         value = amountText,
-        label = { Text("Receipt Amount (${symbolFromCode(currencyCode)})") },
+        label = { Text("Receipt Amount") },
+        prefix = { Text(symbolFromCode(currencyCode)) },
         onValueChange = { newText ->
             amountText = newText
             val parsed = newText.toDoubleOrNull()
@@ -378,6 +382,7 @@ private fun ReceiptFormFields(
         value = receipt.notes,
         label = { Text("Notes") },
         placeholder = { Text("Optional") },
-        onValueChange = onNotesChange
+        onValueChange = onNotesChange,
+        maxLines = 5
     )
 }

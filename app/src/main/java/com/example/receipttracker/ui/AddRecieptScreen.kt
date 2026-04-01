@@ -261,7 +261,8 @@ fun AddReceiptScreen(
             OutlinedTextField(
                 value = amount,
                 onValueChange = { amount = it },
-                label = { Text("Amount (${symbolFromCode(currencyCode)})") },
+                prefix = {Text(symbolFromCode(currencyCode))},
+                label = { Text("Amount") },
                 isError = amount.isNotEmpty() && !isAmountValid,
                 supportingText = {
                     if (amount.isNotEmpty() && !isAmountValid) {
@@ -280,6 +281,7 @@ fun AddReceiptScreen(
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
                 placeholder = { Text("Optional") },
+                maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
         }

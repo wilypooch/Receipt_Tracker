@@ -82,7 +82,7 @@ fun TripListCard(
                 }
                 Column {
                     Text(
-                        text = "${symbolFromCode(tripCurrencyCode)} ${dec.format(tripTotal)}",
+                        text = "${symbolFromCode(tripCurrencyCode)}${dec.format(tripTotal)}",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -90,26 +90,3 @@ fun TripListCard(
         }
     }
 }
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun TripListPreview() {
-    ReceiptTrackerTheme {
-        TripList(
-            items = listOf(
-                Trip(23, "SANS", "01/02/23", endDate = "08/03/1993", "GBP", 400.00),
-                Trip(24, "Defcon33", "05/08/25", endDate = "08/03/1993","GBP", 20.00),
-                Trip(25, "Work Trip", "01/02/25", endDate = "08/03/1993", "GBP", 4888.86)
-            ), onTripClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TripListCardPreview() {
-    ReceiptTrackerTheme {
-        TripListCard("Sample Name", tripStartDate = "01/01/1970", tripTotal = 500.00, tripCurrencyCode = "GBP", onClick = {})
-    }
-}*/

@@ -68,53 +68,32 @@ fun ReceiptListCard(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .clickable(
-                onClick = {onClick()}
+                onClick = { onClick() }
             )
     ) {
-        Row(modifier = modifier.padding(16.dp)) {
-            Column {
-                AsyncImage(
-                    model = receiptUri,
-                    contentDescription = "Receipt Preview",
-                    modifier = Modifier
-                        .height(200.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AsyncImage(
+                model = receiptUri,
+                contentDescription = "Receipt Preview",
+                modifier = Modifier
+                    .height(150.dp)
+                    .weight(0.4f),
+            )
+
+            Column(modifier = Modifier.weight(0.6f)) {
+                Text(
+                    text = "${convertMillisToDate(receiptDate)} • ${displayNameFromType(receiptType)}",
+                    style = MaterialTheme.typography.titleSmall
                 )
-            }
-            Column {
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Receipt Date:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(text = convertMillisToDate(receiptDate), style = MaterialTheme.typography.labelMedium)
-                    }
-                }
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Type:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(text = displayNameFromType(receiptType), style = MaterialTheme.typography.labelMedium)
-                    }
-                }
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Total:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(
-                            text = "$currencySymbol ${dec.format(receiptAmount)}",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
-                Row {
-                    Column(modifier.weight(2f)) {
-                        Text(text = "Notes:", style = MaterialTheme.typography.labelMedium)
-                    }
-                    Column {
-                        Text(text = receiptNotes, style = MaterialTheme.typography.labelMedium)
-                    }
+                Text(
+                    text = "$currencySymbol${dec.format(receiptAmount)}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                if (receiptNotes.isNotEmpty()) {
+                    Text(text = receiptNotes, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
