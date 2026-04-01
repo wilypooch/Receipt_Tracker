@@ -379,6 +379,7 @@ private fun ReceiptFormFields(
         value = receipt.notes,
         label = { Text("Notes") },
         placeholder = { Text("Optional") },
-        onValueChange = onNotesChange
+        onValueChange = onNotesChange,
+        maxLines = 5
     )
 }

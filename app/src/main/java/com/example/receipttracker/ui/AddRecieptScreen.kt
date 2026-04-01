@@ -281,6 +281,7 @@ fun AddReceiptScreen(
                 onValueChange = { notes = it },
                 label = { Text("Notes") },
                 placeholder = { Text("Optional") },
+                maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
         }
