@@ -23,6 +23,7 @@ gen/
 
 # IntelliJ
 *.iml
+*.iws
 .idea/
 misc.xml
 deploymentTargetDropDown.xml
@@ -37,3 +38,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Kotlin Gradle
+.kotlin/
