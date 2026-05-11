@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import uk.wilypooch.receipttracker.R
@@ -96,14 +97,14 @@ fun EditTripScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Trip Details") },
+                title = { Text(stringResource(R.string.trip_details)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         handleBackNavigation()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -120,14 +121,14 @@ fun EditTripScreen(
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_save),
-                            contentDescription = "Save"
+                            contentDescription = stringResource(R.string.save)
                         )
                     }
                     if (tripToDisplay.tripId > 0) {
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete"
+                                contentDescription = stringResource(R.string.delete)
                             )
                         }
                     }
@@ -193,7 +194,7 @@ fun TripDetailContent(
     ) {
         OutlinedTextField(
             value = trip.name,
-            label = { Text("Trip Name") },
+            label = { Text(stringResource(R.string.trip_name)) },
             onValueChange = onNameChange,
             singleLine = true,
             keyboardOptions = KeyboardOptions(
@@ -204,14 +205,14 @@ fun TripDetailContent(
             value = if (trip.startDate == 0L) {
                 ""
             } else convertMillisToDate(trip.startDate),
-            label = { Text("Start Date") },
+            label = { Text(stringResource(R.string.start_date)) },
             onValueChange = { },
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
                     Icon(
                         painterResource(R.drawable.ic_calendar_today),
-                        contentDescription = "Select Start Date"
+                        contentDescription = stringResource(R.string.select_start_date)
                     )
                 }
             },
@@ -226,14 +227,14 @@ fun TripDetailContent(
             value = if (trip.endDate == 0L) {
                 ""
             } else convertMillisToDate(trip.endDate),
-            label = { Text("End Date") },
+            label = { Text(stringResource(R.string.end_date)) },
             onValueChange = { },
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
                     Icon(
                         painterResource(R.drawable.ic_calendar_today),
-                        contentDescription = "Select End Date"
+                        contentDescription = stringResource(R.string.select_end_date)
                     )
                 }
             },
@@ -262,11 +263,11 @@ fun TripDetailContent(
                             showDatePicker = false
                         }
                     ) {
-                        Text("OK")
+                        Text(stringResource(R.string.ok))
                     }
                 }, dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             ) { TripDateRangePicker(state = datePickerState) }
