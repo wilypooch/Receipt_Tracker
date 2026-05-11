@@ -15,8 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import uk.wilypooch.receipttracker.R
 import uk.wilypooch.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import uk.wilypooch.receipttracker.data.Receipt
 import uk.wilypooch.receipttracker.data.ReceiptType.Companion.displayNameFromType
@@ -77,7 +79,7 @@ fun ReceiptListCard(
         ) {
             AsyncImage(
                 model = receiptUri,
-                contentDescription = "Receipt Preview",
+                contentDescription = stringResource(R.string.receipt_preview),
                 modifier = Modifier
                     .height(150.dp)
                     .weight(0.4f),
