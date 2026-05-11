@@ -24,9 +24,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import uk.wilypooch.receipttracker.R
 import uk.wilypooch.receipttracker.ui.theme.ReceiptTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,10 +49,10 @@ fun UnsavedChangesDialog(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Filled.Warning, contentDescription = "Warning")
+                Icon(Icons.Filled.Warning, contentDescription = stringResource(R.string.warning))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "You have unsaved changes. Are you sure you want to discard them?",
+                    text = stringResource(R.string.unsaved_changings_warning),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -58,12 +60,12 @@ fun UnsavedChangesDialog(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    TextButton(onClick = onDismiss) { Text("Keep Editing") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.keep_editing)) }
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(
                         onClick = onConfirmDiscard,
                         colors = ButtonDefaults.buttonColors()
-                    ) { Text("Discard") }
+                    ) { Text(stringResource(R.string.discard)) }
                 }
             }
         }
