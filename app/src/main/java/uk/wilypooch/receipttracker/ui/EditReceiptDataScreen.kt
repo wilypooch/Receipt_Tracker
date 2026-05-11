@@ -43,10 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import uk.wilypooch.receipttracker.R
 import uk.wilypooch.receipttracker.data.AppCurrency.Companion.symbolFromCode
 import uk.wilypooch.receipttracker.data.Receipt
@@ -58,7 +60,6 @@ import uk.wilypooch.receipttracker.ui.utils.ReceiptTypeDropdown
 import uk.wilypooch.receipttracker.ui.utils.UnsavedChangesDialog
 import uk.wilypooch.receipttracker.ui.utils.convertMillisToDate
 import uk.wilypooch.receipttracker.ui.utils.exportReceiptToGallery
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -117,7 +118,7 @@ fun EditReceiptDataScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Receipt Details") },
+                title = { Text(stringResource(R.string.receipt_details)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         handleBackNavigation()
@@ -142,7 +143,7 @@ fun EditReceiptDataScreen(
                     }) {
                         Icon(
                             painterResource(R.drawable.ic_download),
-                            contentDescription = "Download Receipt Photo"
+                            contentDescription = stringResource(R.string.download_receipt_photo)
                         )
                     }
                     if (receiptToDisplay != null) {
@@ -159,13 +160,13 @@ fun EditReceiptDataScreen(
                         ) {
                             Icon(
                                 painterResource(R.drawable.ic_save),
-                                contentDescription = "Save"
+                                contentDescription = stringResource(R.string.save)
                             )
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete"
+                                contentDescription = stringResource(R.string.delete)
                             )
                         }
                         if (showDeleteDialog) {
@@ -234,7 +235,7 @@ fun EditReceiptDataContent(
     val image = @Composable {
         AsyncImage(
             model = receipt.imageUri,
-            contentDescription = "Receipt Image",
+            contentDescription = stringResource(R.string.receipt_image),
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = if (isExpanded) 600.dp else 400.dp)
@@ -318,7 +319,7 @@ private fun ReceiptFormFields(
             IconButton(onClick = { showDatePicker = true }) {
                 Icon(
                     painterResource(R.drawable.ic_calendar_today),
-                    contentDescription = "Select Receipt Date"
+                    contentDescription = stringResource(R.string.select_receipt_date)
                 )
             }
         },
@@ -347,7 +348,7 @@ private fun ReceiptFormFields(
                     datePickerState.selectedDateMillis = receipt.date
                     showDatePicker = false
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) { ReceiptDatePicker(state = datePickerState) }
@@ -362,7 +363,7 @@ private fun ReceiptFormFields(
 
     OutlinedTextField(
         value = amountText,
-        label = { Text("Receipt Amount") },
+        label = { Text(stringResource(R.string.receipt_amount)) },
         prefix = { Text(symbolFromCode(currencyCode)) },
         onValueChange = { newText ->
             amountText = newText
@@ -380,8 +381,8 @@ private fun ReceiptFormFields(
 
     OutlinedTextField(
         value = receipt.notes,
-        label = { Text("Notes") },
-        placeholder = { Text("Optional") },
+        label = { Text(stringResource(R.string.notes)) },
+        placeholder = { Text(stringResource(R.string.optional)) },
         onValueChange = onNotesChange,
         maxLines = 5
     )
