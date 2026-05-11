@@ -11,7 +11,9 @@ import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import uk.wilypooch.receipttracker.R
 
 @Composable
 fun TripDateRangePicker(state: DateRangePickerState) {
@@ -19,17 +21,17 @@ fun TripDateRangePicker(state: DateRangePickerState) {
         state = state,
         title = {
             Text(
-                text = "Select trip dates", modifier = Modifier.padding(16.dp)
+                text = stringResource(R.string.select_trip_dates), modifier = Modifier.padding(16.dp)
             )
         }, headline = {
             Row(modifier = Modifier.padding(16.dp)) {
                 Box(Modifier.weight(1f)) {
                     (state.selectedStartDateMillis?.let { convertMillisToDate(it) }
-                        ?: "Start Date").let { Text(it) }
+                        ?: stringResource(R.string.start_date)).let { Text(it) }
                 }
                 Box(Modifier.weight(1f)) {
                     (state.selectedEndDateMillis?.let { convertMillisToDate(it) }
-                        ?: "End Date").let { Text(it) }
+                        ?: stringResource(R.string.end_date)).let { Text(it) }
                 }
             }
         },
