@@ -39,6 +39,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -124,14 +125,14 @@ fun AddReceiptScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Receipt") },
+                title = { Text(stringResource(R.string.add_receipt)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         handleBackNavigation()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -151,7 +152,7 @@ fun AddReceiptScreen(
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_save),
-                            contentDescription = "Save"
+                            contentDescription = stringResource(R.string.save)
                         )
                     }
                 }
@@ -168,7 +169,7 @@ fun AddReceiptScreen(
             if (capturedImageUri != null) {
                 AsyncImage(
                     model = capturedImageUri,
-                    contentDescription = "Receipt Preview",
+                    contentDescription = stringResource(R.string.receipt_preview),
                     modifier = Modifier
                         .height(200.dp)
                         .fillMaxWidth()
@@ -188,7 +189,7 @@ fun AddReceiptScreen(
                         }
                     }
                 ) {
-                    Text("Take Photo of Receipt")
+                    Text(stringResource(R.string.take_photo_of_receipt))
                 }
                 Button(
                     onClick = {
@@ -197,7 +198,7 @@ fun AddReceiptScreen(
                         )
                     }
                 ) {
-                    Text("Select from Gallery")
+                    Text(stringResource(R.string.select_from_gallery))
                 }
 
             }
@@ -206,14 +207,14 @@ fun AddReceiptScreen(
 
             OutlinedTextField(
                 value = convertMillisToDate(selectedDate),
-                label = { Text("Receipt Date") },
+                label = { Text(stringResource(R.string.receipt_date)) },
                 readOnly = true,
                 onValueChange = { },
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
                         Icon(
                             painterResource(R.drawable.ic_calendar_today),
-                            contentDescription = "Select Receipt Date"
+                            contentDescription = stringResource(R.string.select_receipt_date)
                         )
                     }
                 },
@@ -239,7 +240,7 @@ fun AddReceiptScreen(
                                 showDatePicker = false
                             }
                         ) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     }, dismissButton = {
                         TextButton(onClick = {
@@ -247,7 +248,7 @@ fun AddReceiptScreen(
                                 selectedDate
                             showDatePicker = false
                         }) {
-                            Text("Cancel")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 ) { ReceiptDatePicker(state = datePickerState) }
@@ -262,11 +263,11 @@ fun AddReceiptScreen(
                 value = amount,
                 onValueChange = { amount = it },
                 prefix = {Text(symbolFromCode(currencyCode))},
-                label = { Text("Amount") },
+                label = { Text(stringResource(R.string.amount)) },
                 isError = amount.isNotEmpty() && !isAmountValid,
                 supportingText = {
                     if (amount.isNotEmpty() && !isAmountValid) {
-                        Text("Please enter a valid number")
+                        Text(stringResource(R.string.please_enter_a_valid_number))
                     }
                 },
                 singleLine = true,
@@ -279,8 +280,8 @@ fun AddReceiptScreen(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
-                placeholder = { Text("Optional") },
+                label = { Text(stringResource(R.string.notes)) },
+                placeholder = { Text(stringResource(R.string.optional)) },
                 maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
