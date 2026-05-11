@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receipt_preview">Receipt Preview</string>
+    <string name="select_from_gallery">Select from Gallery</string>
+    <string name="receipt_date">Receipt Date</string>
+    <string name="select_receipt_date">Select Receipt Date</string>
+    <string name="notes">Notes</string>
+    <string name="optional">Optional</string>
+    <string name="amount">Amount</string>
+    <string name="take_photo_of_receipt">Take Photo of Receipt</string>
+    <string name="add_receipt">Add Receipt</string>
+    <string name="receipt_details">Receipt Details</string>
+    <string name="receipt_exported">Receipt Exported</string>
+    <string name="download_receipt_photo">Download Receipt Photo</string>
+    <string name="receipt_image">Receipt Image</string>
+    <string name="receipt_amount">Receipt Amount</string>
+</resources>
