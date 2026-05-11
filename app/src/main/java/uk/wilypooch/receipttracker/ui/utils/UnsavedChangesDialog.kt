@@ -52,7 +52,7 @@ fun UnsavedChangesDialog(
                 Icon(Icons.Filled.Warning, contentDescription = stringResource(R.string.warning))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = stringResource(R.string.unsaved_changings_warning),
+                    text = stringResource(R.string.unsaved_changes_warning),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))

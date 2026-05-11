@@ -5,10 +5,13 @@
     <string name="warning">Warning</string>
     <string name="keep_editing">Keep Editing</string>
     <string name="discard">Discard</string>
-    <string name="unsaved_changings_warning">You have unsaved changes. Are you sure you want to discard them?</string>
+    <string name="unsaved_changes_warning">You have unsaved changes. Are you sure you want to discard them?</string>
     <string name="back">Back</string>
     <string name="save">Save</string>
     <string name="please_enter_a_valid_number">Please enter a valid number</string>
     <string name="ok">OK</string>
     <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="no_trips_available_message">No trips available.\nAdd one using the button below.</string>
+    <string name="edit">Edit</string>
 </resources>
