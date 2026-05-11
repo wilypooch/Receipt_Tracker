@@ -49,7 +49,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTripClick) {
-                Icon(Icons.Filled.Add, "Add")
+                Icon(Icons.Filled.Add, stringResource(R.string.add))
             }
         }
     ) { innerPadding ->
@@ -63,7 +63,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "No trips available.\nAdd one using the button below.",
+                    stringResource(R.string.no_trips_available_message),
                     textAlign = TextAlign.Center
                 )
             }
